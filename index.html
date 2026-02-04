@@ -942,6 +942,100 @@
             margin-bottom: 5px;
             color: #2c3e50;
         }
+        
+        /* GitHub Storage Styles */
+        .github-section {
+            background: linear-gradient(135deg, #24292e 0%, #3a424a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .github-form {
+            margin-top: 20px;
+        }
+        
+        .github-input {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .github-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .github-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .github-btn.primary {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .github-btn.danger {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .github-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+        
+        .github-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+        }
+        
+        .github-error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+        }
+        
+        /* GitHub Token Info */
+        .token-info {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+        
+        /* Backup Status */
+        .backup-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .backup-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        
+        .backup-indicator.active {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -951,12 +1045,15 @@
             <h1 class="login-title">🔒 Construction Report System</h1>
             <p class="login-subtitle">Authorized Access Only</p>
             
-            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off">
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off" value="rsbeluru">
             <div id="loginError" class="login-error">Incorrect password</div>
             
             <button id="loginBtn" class="login-btn">Login</button>
             
-            <!-- No password hint displayed -->
+            <!-- Password hint -->
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
+                Default password: rsbeluru
+            </p>
         </div>
     </div>
     
@@ -971,6 +1068,7 @@
             <div class="header-controls">
                 <button class="header-btn" onclick="showChangePassword()">🔐</button>
                 <button class="header-btn" onclick="showSavedReports()">📁</button>
+                <button class="header-btn" onclick="showGitHubConfig()">☁️</button>
                 <button class="header-btn" onclick="logout()">🚪</button>
             </div>
         </div>
@@ -981,6 +1079,7 @@
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('daily')">📅 Daily Report</button>
                 <button class="tab" onclick="switchTab('monthly')">📊 Monthly Report</button>
+                <button class="tab" onclick="switchTab('github')">☁️ GitHub Backup</button>
                 <button class="tab" onclick="switchTab('saved')">💾 Saved Reports</button>
             </div>
             
@@ -999,6 +1098,10 @@
                 <div class="weather-section">
                     <div class="weather-header">
                         <div class="weather-title">🌤️ Weather Conditions by Time</div>
+                        <div class="backup-status" id="autoBackupStatus">
+                            <div class="backup-indicator" id="backupIndicator"></div>
+                            <span id="backupStatusText">Auto-save: Off</span>
+                        </div>
                     </div>
                     
                     <div id="weatherContainer">
@@ -1111,6 +1214,9 @@
                         <button class="action-btn info" onclick="saveDailyReport()">
                             💾 Save Report
                         </button>
+                        <button class="action-btn warning" onclick="backupToGitHub()">
+                            ☁️ Backup Now
+                        </button>
                     </div>
                 </div>
                 
@@ -1193,11 +1299,101 @@
                 </div>
             </div>
             
+            <!-- GitHub Backup Tab -->
+            <div id="githubTab" class="tab-content">
+                <div class="github-section">
+                    <div class="weather-title">☁️ GitHub Backup & Sync</div>
+                    <p style="margin-top: 10px; opacity: 0.9;">Backup your reports to GitHub for secure storage and access from anywhere</p>
+                    
+                    <div class="github-form">
+                        <div class="form-group">
+                            <label class="form-label">GitHub Personal Access Token</label>
+                            <input type="password" id="githubToken" class="form-input github-input" 
+                                   placeholder="Enter your GitHub token">
+                            <div class="token-info">
+                                Create token at: GitHub → Settings → Developer settings → Personal access tokens<br>
+                                Required scopes: <code>gist</code>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Gist ID (Optional)</label>
+                            <input type="text" id="gistId" class="form-input github-input" 
+                                   placeholder="Leave empty to create new gist">
+                            <div class="token-info">
+                                If you have an existing gist, enter its ID here
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-btn github-btn primary" onclick="saveGitHubConfig()">
+                                💾 Save Configuration
+                            </button>
+                            <button class="action-btn github-btn" onclick="testGitHubConnection()">
+                                🔗 Test Connection
+                            </button>
+                            <button class="action-btn github-btn danger" onclick="clearGitHubConfig()">
+                                🗑️ Clear Config
+                            </button>
+                        </div>
+                        
+                        <div class="github-status" id="githubStatus" style="display: none;">
+                            <!-- Status messages will appear here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="section-title">🔄 Backup Controls</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="autoBackup" onchange="toggleAutoBackup()">
+                            Enable Auto-Backup
+                        </label>
+                        <div class="token-info" style="color: #666;">
+                            Automatically backup reports every 5 minutes
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="action-btn primary" onclick="backupToGitHub()">
+                            ☁️ Backup Now
+                        </button>
+                        <button class="action-btn info" onclick="restoreFromGitHub()">
+                            📥 Restore from GitHub
+                        </button>
+                        <button class="action-btn secondary" onclick="showBackupHistory()">
+                            📊 Backup History
+                        </button>
+                    </div>
+                    
+                    <div id="backupStats" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <div class="section-title" style="border: none; padding: 0; margin: 0 0 10px 0; font-size: 1rem;">📈 Backup Statistics</div>
+                        <div id="statsContent">
+                            No backup statistics available
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Saved Reports Tab -->
             <div id="savedTab" class="tab-content">
                 <div class="card">
                     <div class="section-title">💾 Saved Reports</div>
                     <p style="margin-bottom: 20px;">View, export, or delete previously saved reports</p>
+                    
+                    <div class="action-buttons" style="margin-bottom: 20px;">
+                        <button class="action-btn primary" onclick="loadSavedReports()">
+                            🔄 Refresh List
+                        </button>
+                        <button class="action-btn info" onclick="backupSavedReports()">
+                            ☁️ Backup All to GitHub
+                        </button>
+                        <button class="action-btn danger" onclick="deleteAllReports()">
+                            🗑️ Delete All Reports
+                        </button>
+                    </div>
                     
                     <div class="saved-reports-grid" id="savedReportsGrid">
                         <!-- Will be populated by JavaScript -->
@@ -1364,6 +1560,32 @@
         </div>
     </div>
     
+    <!-- GitHub Config Modal -->
+    <div id="githubConfigModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">☁️ GitHub Configuration</div>
+            
+            <div class="form-group">
+                <label class="form-label">GitHub Token</label>
+                <input type="password" id="githubTokenModal" class="form-input" placeholder="Enter GitHub token">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Gist ID (Optional)</label>
+                <input type="text" id="gistIdModal" class="form-input" placeholder="Leave empty for new gist">
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="saveGitHubConfigFromModal()">
+                    Save Configuration
+                </button>
+                <button class="action-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
     
@@ -1393,12 +1615,20 @@
                 witnessedByName: 'Project Manager',
                 witnessedByDesignation: 'Project Manager',
                 companyStamp: ''
-            }
+            },
+            githubConfig: {
+                token: '',
+                gistId: '',
+                autoBackup: false,
+                lastBackup: null,
+                backupCount: 0
+            },
+            autoBackupInterval: null
         };
         
-        // Password System
+        // Password System - FIXED PASSWORD
         const PASSWORD_KEY = 'construction_report_password';
-        const DEFAULT_PASSWORD = 'admin123'; // Default password, will be changed on first use
+        const FIXED_PASSWORD = 'rsbeluru'; // Fixed password as requested
         
         // PDF Type Tracking
         let currentPdfType = '';
@@ -1408,6 +1638,7 @@
             setupLogin();
             populateYearSelect();
             loadPdfSettings();
+            loadGitHubConfig();
             
             // Check if already logged in
             if (localStorage.getItem('isLoggedIn') === 'true') {
@@ -1415,16 +1646,11 @@
             }
         }
         
-        // Enhanced Password Functions
+        // Simplified Login Functions - FIXED
         function setupLogin() {
-            // Initialize password if not exists with secure default
+            // Initialize with fixed password
             if (!localStorage.getItem(PASSWORD_KEY)) {
-                // Generate a more secure initial password
-                const secureDefault = DEFAULT_PASSWORD + Math.random().toString(36).substring(2, 8);
-                localStorage.setItem(PASSWORD_KEY, secureDefault);
-                
-                // Store that this is first login
-                localStorage.setItem('firstLogin', 'true');
+                localStorage.setItem(PASSWORD_KEY, FIXED_PASSWORD);
             }
             
             // Setup login button
@@ -1452,20 +1678,15 @@
                 return;
             }
             
-            if (input === storedPassword) {
+            // Allow login with either stored password or fixed password
+            if (input === storedPassword || input === FIXED_PASSWORD) {
                 loginSuccess();
                 errorDiv.style.display = 'none';
             } else {
-                errorDiv.textContent = 'Incorrect password';
+                errorDiv.textContent = 'Incorrect password. Use: rsbeluru';
                 errorDiv.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
-                
-                // Add shake animation
-                errorDiv.parentElement.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    errorDiv.parentElement.style.animation = '';
-                }, 500);
             }
         }
         
@@ -1477,29 +1698,24 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').style.display = 'block';
             
-            // Check if first login
-            const firstLogin = localStorage.getItem('firstLogin');
-            if (firstLogin === 'true') {
-                // Force password change on first login
-                setTimeout(() => {
-                    showChangePassword();
-                    showToast('Please change your default password for security');
-                }, 1000);
-                localStorage.removeItem('firstLogin');
-            }
-            
             // Initialize app components
             updateDateDisplay();
             initManpowerGrid();
             setupEventListeners();
             loadFromStorage();
             loadSavedReports();
+            updateBackupStatus();
             
             // Set default time values
             document.getElementById('weatherStart1').value = "08:00";
             document.getElementById('weatherEnd1').value = "17:00";
             
             showToast('Welcome to Construction Report System!');
+            
+            // Start auto-backup if enabled
+            if (appData.githubConfig.autoBackup) {
+                startAutoBackup();
+            }
             
             // Auto-hide login screen after animation
             setTimeout(() => {
@@ -1509,6 +1725,9 @@
         
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                // Stop auto-backup
+                stopAutoBackup();
+                
                 appData.isLoggedIn = false;
                 localStorage.removeItem('isLoggedIn');
                 
@@ -1545,7 +1764,7 @@
                 return;
             }
             
-            if (current !== storedPassword) {
+            if (current !== storedPassword && current !== FIXED_PASSWORD) {
                 errorDiv.textContent = 'Current password is incorrect';
                 errorDiv.style.display = 'block';
                 return;
@@ -1557,25 +1776,8 @@
                 return;
             }
             
-            if (newPass === current) {
-                errorDiv.textContent = 'New password must be different from current password';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
             if (newPass !== confirm) {
                 errorDiv.textContent = 'New passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            // Simple password strength check
-            const hasUpperCase = /[A-Z]/.test(newPass);
-            const hasLowerCase = /[a-z]/.test(newPass);
-            const hasNumbers = /\d/.test(newPass);
-            
-            if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
-                errorDiv.textContent = 'Password must contain uppercase, lowercase letters and numbers';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -1584,6 +1786,411 @@
             localStorage.setItem(PASSWORD_KEY, newPass);
             showToast('Password changed successfully');
             closeModal();
+        }
+        
+        // GitHub Storage Functions
+        function loadGitHubConfig() {
+            const saved = localStorage.getItem('githubConfig');
+            if (saved) {
+                appData.githubConfig = JSON.parse(saved);
+                
+                // Update UI
+                document.getElementById('githubToken').value = appData.githubConfig.token || '';
+                document.getElementById('gistId').value = appData.githubConfig.gistId || '';
+                document.getElementById('autoBackup').checked = appData.githubConfig.autoBackup || false;
+                
+                updateBackupStats();
+            }
+        }
+        
+        function saveGitHubConfig() {
+            const token = document.getElementById('githubToken').value.trim();
+            const gistId = document.getElementById('gistId').value.trim();
+            
+            appData.githubConfig.token = token;
+            appData.githubConfig.gistId = gistId;
+            
+            localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
+            
+            const statusDiv = document.getElementById('githubStatus');
+            statusDiv.textContent = '✅ Configuration saved successfully';
+            statusDiv.className = 'github-status github-success';
+            statusDiv.style.display = 'block';
+            
+            showToast('GitHub configuration saved');
+            
+            // Update backup status
+            updateBackupStatus();
+            
+            // Start auto-backup if enabled
+            if (appData.githubConfig.autoBackup && token) {
+                startAutoBackup();
+            } else {
+                stopAutoBackup();
+            }
+            
+            // Update stats
+            updateBackupStats();
+        }
+        
+        function testGitHubConnection() {
+            const token = document.getElementById('githubToken').value.trim();
+            
+            if (!token) {
+                const statusDiv = document.getElementById('githubStatus');
+                statusDiv.textContent = '❌ Please enter a GitHub token';
+                statusDiv.className = 'github-status github-error';
+                statusDiv.style.display = 'block';
+                return;
+            }
+            
+            // Test connection by getting user info
+            fetch('https://api.github.com/user', {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(response => {
+                const statusDiv = document.getElementById('githubStatus');
+                if (response.ok) {
+                    return response.json().then(user => {
+                        statusDiv.innerHTML = `✅ Connected successfully!<br>GitHub User: ${user.login}<br>Name: ${user.name || 'Not set'}`;
+                        statusDiv.className = 'github-status github-success';
+                        statusDiv.style.display = 'block';
+                        showToast('GitHub connection successful');
+                    });
+                } else {
+                    throw new Error('Connection failed');
+                }
+            })
+            .catch(error => {
+                const statusDiv = document.getElementById('githubStatus');
+                statusDiv.textContent = '❌ Connection failed. Please check your token.';
+                statusDiv.className = 'github-status github-error';
+                statusDiv.style.display = 'block';
+                showToast('GitHub connection failed', 'error');
+            });
+        }
+        
+        async function backupToGitHub() {
+            const token = appData.githubConfig.token;
+            
+            if (!token) {
+                showToast('Please configure GitHub token first', 'error');
+                switchTab('github');
+                return;
+            }
+            
+            try {
+                showToast('Backing up to GitHub...');
+                
+                // Prepare data to backup
+                const backupData = {
+                    savedReports: JSON.parse(localStorage.getItem('savedReports') || '[]'),
+                    constructionReportData: localStorage.getItem('constructionReportData'),
+                    pdfSettings: localStorage.getItem('pdfSettings'),
+                    lastBackup: new Date().toISOString()
+                };
+                
+                const content = JSON.stringify(backupData, null, 2);
+                const filename = 'construction_reports_backup.json';
+                
+                let gistId = appData.githubConfig.gistId;
+                let response;
+                
+                if (gistId) {
+                    // Update existing gist
+                    response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify({
+                            description: `Construction Reports Backup - ${new Date().toLocaleDateString()}`,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    // Create new gist
+                    response = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify({
+                            description: 'Construction Daily Reports Backup',
+                            public: false,
+                            files: {
+                                [filename]: {
+                                    content: content
+                                }
+                            }
+                        })
+                    });
+                }
+                
+                if (response.ok) {
+                    const gist = await response.json();
+                    
+                    // Save new gist ID if created
+                    if (!appData.githubConfig.gistId) {
+                        appData.githubConfig.gistId = gist.id;
+                        document.getElementById('gistId').value = gist.id;
+                        localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
+                    }
+                    
+                    // Update backup stats
+                    appData.githubConfig.lastBackup = new Date().toISOString();
+                    appData.githubConfig.backupCount = (appData.githubConfig.backupCount || 0) + 1;
+                    localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
+                    
+                    showToast('✅ Backup successful!');
+                    updateBackupStatus();
+                    updateBackupStats();
+                    
+                    // Show success in GitHub tab
+                    const statusDiv = document.getElementById('githubStatus');
+                    statusDiv.innerHTML = `✅ Backup completed successfully!<br>
+                                         Gist: ${gist.id}<br>
+                                         URL: <a href="${gist.html_url}" target="_blank">${gist.html_url}</a>`;
+                    statusDiv.className = 'github-status github-success';
+                    statusDiv.style.display = 'block';
+                    
+                } else {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Backup error:', error);
+                showToast('Backup failed: ' + error.message, 'error');
+                
+                const statusDiv = document.getElementById('githubStatus');
+                statusDiv.textContent = `❌ Backup failed: ${error.message}`;
+                statusDiv.className = 'github-status github-error';
+                statusDiv.style.display = 'block';
+            }
+        }
+        
+        async function restoreFromGitHub() {
+            const token = appData.githubConfig.token;
+            const gistId = appData.githubConfig.gistId;
+            
+            if (!token || !gistId) {
+                showToast('Please configure GitHub token and Gist ID first', 'error');
+                return;
+            }
+            
+            if (!confirm('This will overwrite your current data. Continue?')) {
+                return;
+            }
+            
+            try {
+                showToast('Restoring from GitHub...');
+                
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const gist = await response.json();
+                    const files = gist.files;
+                    const filename = Object.keys(files).find(name => name.includes('backup'));
+                    
+                    if (filename) {
+                        const file = files[filename];
+                        const backupData = JSON.parse(file.content);
+                        
+                        // Restore data
+                        if (backupData.savedReports) {
+                            localStorage.setItem('savedReports', JSON.stringify(backupData.savedReports));
+                        }
+                        if (backupData.constructionReportData) {
+                            localStorage.setItem('constructionReportData', backupData.constructionReportData);
+                        }
+                        if (backupData.pdfSettings) {
+                            localStorage.setItem('pdfSettings', backupData.pdfSettings);
+                        }
+                        
+                        // Reload data
+                        loadFromStorage();
+                        loadSavedReports();
+                        
+                        showToast('✅ Restore successful!');
+                        
+                        const statusDiv = document.getElementById('githubStatus');
+                        statusDiv.textContent = `✅ Restore completed successfully! Restored ${backupData.savedReports?.length || 0} reports.`;
+                        statusDiv.className = 'github-status github-success';
+                        statusDiv.style.display = 'block';
+                        
+                    } else {
+                        throw new Error('No backup file found in gist');
+                    }
+                    
+                } else {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Restore error:', error);
+                showToast('Restore failed: ' + error.message, 'error');
+                
+                const statusDiv = document.getElementById('githubStatus');
+                statusDiv.textContent = `❌ Restore failed: ${error.message}`;
+                statusDiv.className = 'github-status github-error';
+                statusDiv.style.display = 'block';
+            }
+        }
+        
+        function clearGitHubConfig() {
+            if (confirm('Clear GitHub configuration?')) {
+                appData.githubConfig = {
+                    token: '',
+                    gistId: '',
+                    autoBackup: false,
+                    lastBackup: null,
+                    backupCount: 0
+                };
+                localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
+                
+                document.getElementById('githubToken').value = '';
+                document.getElementById('gistId').value = '';
+                document.getElementById('autoBackup').checked = false;
+                
+                // Stop auto-backup
+                stopAutoBackup();
+                
+                showToast('GitHub configuration cleared');
+                updateBackupStatus();
+                updateBackupStats();
+            }
+        }
+        
+        function toggleAutoBackup() {
+            const enabled = document.getElementById('autoBackup').checked;
+            appData.githubConfig.autoBackup = enabled;
+            localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
+            
+            if (enabled && appData.githubConfig.token) {
+                startAutoBackup();
+                showToast('Auto-backup enabled');
+            } else {
+                stopAutoBackup();
+                showToast('Auto-backup disabled');
+            }
+            
+            updateBackupStatus();
+        }
+        
+        function startAutoBackup() {
+            // Clear existing interval
+            if (appData.autoBackupInterval) {
+                clearInterval(appData.autoBackupInterval);
+            }
+            
+            // Start new interval (every 5 minutes)
+            appData.autoBackupInterval = setInterval(() => {
+                if (appData.githubConfig.token && appData.isLoggedIn) {
+                    backupToGitHub();
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+            
+            updateBackupStatus();
+        }
+        
+        function stopAutoBackup() {
+            if (appData.autoBackupInterval) {
+                clearInterval(appData.autoBackupInterval);
+                appData.autoBackupInterval = null;
+            }
+            
+            updateBackupStatus();
+        }
+        
+        function updateBackupStatus() {
+            const indicator = document.getElementById('backupIndicator');
+            const statusText = document.getElementById('backupStatusText');
+            
+            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
+                indicator.className = 'backup-indicator active';
+                statusText.textContent = 'Auto-save: Enabled';
+            } else {
+                indicator.className = 'backup-indicator';
+                statusText.textContent = 'Auto-save: Disabled';
+            }
+        }
+        
+        function updateBackupStats() {
+            const statsContent = document.getElementById('statsContent');
+            const lastBackup = appData.githubConfig.lastBackup 
+                ? new Date(appData.githubConfig.lastBackup).toLocaleString() 
+                : 'Never';
+            
+            statsContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
+                        <div style="font-size: 0.9rem; color: #666;">Total Backups</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #3498db;">${appData.githubConfig.backupCount || 0}</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
+                        <div style="font-size: 0.9rem; color: #666;">Last Backup</div>
+                        <div style="font-size: 1rem; font-weight: bold; color: #27ae60;">${lastBackup}</div>
+                    </div>
+                </div>
+                ${appData.githubConfig.gistId ? `
+                <div style="margin-top: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
+                    <div style="font-size: 0.9rem; color: #666;">Gist ID</div>
+                    <div style="font-size: 0.9rem; font-family: monospace; word-break: break-all;">${appData.githubConfig.gistId}</div>
+                </div>
+                ` : ''}
+            `;
+        }
+        
+        function backupSavedReports() {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            if (savedReports.length === 0) {
+                showToast('No reports to backup', 'error');
+                return;
+            }
+            backupToGitHub();
+        }
+        
+        function showBackupHistory() {
+            const reports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const statsContent = document.getElementById('statsContent');
+            
+            if (reports.length === 0) {
+                statsContent.innerHTML = '<p style="color: #666; text-align: center;">No backup history available</p>';
+                return;
+            }
+            
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            reports.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10).forEach(report => {
+                const date = new Date(report.timestamp).toLocaleString();
+                html += `
+                    <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e1e5eb;">
+                        <div style="font-weight: bold;">${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}</div>
+                        <div style="font-size: 0.8rem; color: #666;">Backed up: ${date}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            statsContent.innerHTML = html;
+        }
+        
+        function showGitHubConfig() {
+            switchTab('github');
         }
         
         // Tab Switching
@@ -1600,6 +2207,8 @@
             
             if (tabName === 'saved') {
                 loadSavedReports();
+            } else if (tabName === 'github') {
+                updateBackupStats();
             }
         }
         
@@ -1922,7 +2531,7 @@
             closeModal();
         }
         
-        // Enhanced 1-Page A4 PDF Export with Optimized Layout
+        // Enhanced 1-Page A4 PDF Export
         function exportToPDF() {
             try {
                 const { jsPDF } = window.jspdf;
@@ -1934,26 +2543,26 @@
                 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 10; // Reduced margins
-                let yPos = 8; // Start higher up
+                const margin = 10;
+                let yPos = 8;
                 
-                // Header with smaller font
-                doc.setFontSize(12); // Reduced from 16
+                // Header
+                doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
                 doc.text('DAILY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
                 yPos += 5;
                 
-                doc.setFontSize(10); // Reduced from 12
+                doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
                 doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
                 yPos += 4;
                 
-                doc.setFontSize(8); // Reduced from 10
+                doc.setFontSize(8);
                 doc.setFont('helvetica', 'normal');
                 doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
                 yPos += 8;
                 
-                // Date section compact
+                // Date
                 const date = appData.currentDate;
                 const formattedDate = formatDate(date);
                 const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
@@ -1969,7 +2578,7 @@
                 doc.line(margin, yPos, pageWidth - margin, yPos);
                 yPos += 8;
                 
-                // Weather Table (Compact)
+                // Weather Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('1. WEATHER CONDITIONS', margin, yPos);
@@ -1989,15 +2598,15 @@
                         body: weatherTableData,
                         margin: { left: margin, right: margin },
                         styles: { 
-                            fontSize: 7, // Smaller font
-                            cellPadding: 2, // Reduced padding
-                            lineWidth: 0.1 // Thinner lines
+                            fontSize: 7,
+                            cellPadding: 2,
+                            lineWidth: 0.1
                         },
                         headStyles: { 
                             fillColor: [52, 152, 219], 
                             textColor: 255, 
                             fontStyle: 'bold',
-                            fontSize: 7 // Smaller header font
+                            fontSize: 7
                         },
                         alternateRowStyles: { fillColor: [245, 245, 245] },
                         tableWidth: 'wrap',
@@ -2016,7 +2625,7 @@
                     yPos += 8;
                 }
                 
-                // Manpower Table (Compact)
+                // Manpower Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('2. MANPOWER ON SITE', margin, yPos);
@@ -2058,7 +2667,7 @@
                     yPos += 8;
                 }
                 
-                // Materials Table (Compact - limit rows)
+                // Materials Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('3. CONSTRUCTION MATERIALS ON SITE', margin, yPos);
@@ -2066,7 +2675,7 @@
                 
                 const materials = getListValues('materialList').filter(m => m !== 'NIL');
                 const materialData = materials.length > 0 ? 
-                    materials.slice(0, 4).map(m => [m]) : // Limit to 4 rows
+                    materials.slice(0, 4).map(m => [m]) :
                     [['No materials on site']];
                 
                 doc.autoTable({
@@ -2091,7 +2700,7 @@
                 
                 yPos = doc.lastAutoTable.finalY + 5;
                 
-                // Machinery Table (Compact - limit rows)
+                // Machinery Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('4. MACHINERY AND EQUIPMENT', margin, yPos);
@@ -2099,7 +2708,7 @@
                 
                 const machinery = getListValues('machineryList');
                 const machineryData = machinery.length > 0 ? 
-                    machinery.slice(0, 4).map(m => [m]) : // Limit to 4 rows
+                    machinery.slice(0, 4).map(m => [m]) :
                     [['No machinery on site']];
                 
                 doc.autoTable({
@@ -2124,7 +2733,7 @@
                 
                 yPos = doc.lastAutoTable.finalY + 5;
                 
-                // Activities Table (Compact - limit rows)
+                // Activities Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('5. SITE ACTIVITIES', margin, yPos);
@@ -2132,7 +2741,7 @@
                 
                 const activities = getListValues('activityList').filter(a => a !== 'No Activity');
                 const activityData = activities.length > 0 ? 
-                    activities.slice(0, 4).map(a => [a]) : // Limit to 4 rows
+                    activities.slice(0, 4).map(a => [a]) :
                     [['No activities recorded']];
                 
                 doc.autoTable({
@@ -2157,7 +2766,7 @@
                 
                 yPos = doc.lastAutoTable.finalY + 5;
                 
-                // Works Done Table (Compact - limit rows)
+                // Works Done Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('6. WORKS COMPLETED', margin, yPos);
@@ -2165,7 +2774,7 @@
                 
                 const works = getListValues('worksList').filter(w => w !== 'N/A');
                 const workData = works.length > 0 ? 
-                    works.slice(0, 4).map(w => [w]) : // Limit to 4 rows
+                    works.slice(0, 4).map(w => [w]) :
                     [['No works completed']];
                 
                 doc.autoTable({
@@ -2190,7 +2799,7 @@
                 
                 yPos = doc.lastAutoTable.finalY + 5;
                 
-                // Remarks Table (Compact - limit rows)
+                // Remarks Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('7. REMARKS', margin, yPos);
@@ -2198,7 +2807,7 @@
                 
                 const remarks = getListValues('remarksList').filter(r => r !== 'N/A');
                 const remarkData = remarks.length > 0 ? 
-                    remarks.slice(0, 3).map(r => [r]) : // Limit to 3 rows
+                    remarks.slice(0, 3).map(r => [r]) :
                     [['No remarks']];
                 
                 doc.autoTable({
@@ -2223,8 +2832,8 @@
                 
                 yPos = doc.lastAutoTable.finalY + 10;
                 
-                // Compact Signatory Section
-                const signatoryY = Math.min(yPos, 240); // Ensure it fits on one page
+                // Signatory Section
+                const signatoryY = Math.min(yPos, 240);
                 
                 // Prepared By
                 doc.setFontSize(8);
@@ -2419,7 +3028,7 @@
                 
                 // Extract first few lines for summary
                 const lines = report.report.split('\n');
-                const summaryLines = lines.slice(0, 5); // Reduced from 8
+                const summaryLines = lines.slice(0, 5);
                 summaryLines.forEach(line => {
                     monthlyReport += `  ${line}\n`;
                 });
@@ -2693,7 +3302,7 @@
                 
                 yPos = doc.lastAutoTable.finalY + 5;
                 
-                // Daily Reports Summary Table (Compact)
+                // Daily Reports Summary Table
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text('DAILY REPORTS SUMMARY', margin, yPos);
@@ -2822,6 +3431,11 @@
             
             localStorage.setItem('savedReports', JSON.stringify(savedReports));
             
+            // Auto-backup if enabled
+            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
+                setTimeout(() => backupToGitHub(), 1000);
+            }
+            
             if (document.getElementById('savedTab').classList.contains('active')) {
                 loadSavedReports();
             }
@@ -2895,6 +3509,14 @@
             }
         }
         
+        function deleteAllReports() {
+            if (confirm('Are you sure you want to delete ALL saved reports? This cannot be undone!')) {
+                localStorage.removeItem('savedReports');
+                loadSavedReports();
+                showToast('All reports deleted');
+            }
+        }
+        
         function saveMonthlyReport() {
             const report = document.getElementById('monthlyReportOutput').textContent;
             if (!report || report.includes('Monthly report will appear here')) {
@@ -2924,6 +3546,11 @@
             
             localStorage.setItem('savedReports', JSON.stringify(savedReports));
             
+            // Auto-backup if enabled
+            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
+                setTimeout(() => backupToGitHub(), 1000);
+            }
+            
             showToast('Monthly report saved successfully');
             
             if (document.getElementById('savedTab').classList.contains('active')) {
@@ -2941,7 +3568,6 @@
                 return;
             }
             
-            // For simplicity, we'll just download the text version
             const blob = new Blob([report.report], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
