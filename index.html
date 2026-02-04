@@ -237,6 +237,76 @@
             transform: scale(0.98);
         }
         
+        /* Progress Section */
+        .progress-section {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .progress-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .progress-type {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .progress-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .progress-input {
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .progress-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
         /* Weather Section */
         .weather-section {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
@@ -764,6 +834,14 @@
             .action-buttons {
                 grid-template-columns: 1fr;
             }
+            
+            .progress-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .weather-row {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 480px) {
@@ -899,6 +977,7 @@
             gap: 5px;
             margin-bottom: 20px;
             border-bottom: 2px solid #e1e5eb;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -909,6 +988,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
         
         .tab.active {
@@ -1036,6 +1118,30 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
+        
+        /* Progress Indicator */
+        .progress-indicator {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .physical-progress {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+        }
+        
+        .financial-progress {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
     </style>
 </head>
 <body>
@@ -1045,15 +1151,10 @@
             <h1 class="login-title">🔒 Construction Report System</h1>
             <p class="login-subtitle">Authorized Access Only</p>
             
-            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off" value="rsbeluru">
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off">
             <div id="loginError" class="login-error">Incorrect password</div>
             
             <button id="loginBtn" class="login-btn">Login</button>
-            
-            <!-- Password hint -->
-            <p style="margin-top: 15px; font-size: 0.9rem; color: #7f8c8d;">
-                Default password: rsbeluru
-            </p>
         </div>
     </div>
     
@@ -1091,6 +1192,71 @@
                     <div class="date-controls">
                         <button class="date-btn" onclick="showDatePicker()">📅 Pick Date</button>
                         <button class="date-btn" onclick="useToday()">🔄 Today</button>
+                    </div>
+                </div>
+                
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <div class="weather-title">📊 Progress Monitoring</div>
+                    
+                    <div class="progress-grid">
+                        <div class="progress-card">
+                            <div class="progress-header">
+                                <div class="progress-type">🏗️ Physical Progress</div>
+                                <div id="physicalProgressValue" style="font-weight: bold; font-size: 1.2rem;">0%</div>
+                            </div>
+                            <div class="progress-inputs">
+                                <div class="progress-input-group">
+                                    <div class="progress-label">Actual (%)</div>
+                                    <input type="number" class="progress-input" id="physicalActual" 
+                                           min="0" max="100" step="0.1" value="0" 
+                                           oninput="updatePhysicalProgress()">
+                                </div>
+                                <div class="progress-input-group">
+                                    <div class="progress-label">Scheduled (%)</div>
+                                    <input type="number" class="progress-input" id="physicalScheduled" 
+                                           min="0" max="100" step="0.1" value="0" 
+                                           oninput="updatePhysicalProgress()">
+                                </div>
+                            </div>
+                            <div class="progress-indicator">
+                                <div class="progress-fill physical-progress" id="physicalProgressBar" style="width: 0%"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.8rem;">
+                                <span>Actual: <span id="physicalActualText">0</span>%</span>
+                                <span>Scheduled: <span id="physicalScheduledText">0</span>%</span>
+                                <span id="physicalVariance" style="font-weight: bold;">Variance: 0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-card">
+                            <div class="progress-header">
+                                <div class="progress-type">💰 Financial Progress</div>
+                                <div id="financialProgressValue" style="font-weight: bold; font-size: 1.2rem;">0%</div>
+                            </div>
+                            <div class="progress-inputs">
+                                <div class="progress-input-group">
+                                    <div class="progress-label">Actual (%)</div>
+                                    <input type="number" class="progress-input" id="financialActual" 
+                                           min="0" max="100" step="0.1" value="0" 
+                                           oninput="updateFinancialProgress()">
+                                </div>
+                                <div class="progress-input-group">
+                                    <div class="progress-label">Scheduled (%)</div>
+                                    <input type="number" class="progress-input" id="financialScheduled" 
+                                           min="0" max="100" step="0.1" value="0" 
+                                           oninput="updateFinancialProgress()">
+                                </div>
+                            </div>
+                            <div class="progress-indicator">
+                                <div class="progress-fill financial-progress" id="financialProgressBar" style="width: 0%"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.8rem;">
+                                <span>Actual: <span id="financialActualText">0</span>%</span>
+                                <span>Scheduled: <span id="financialScheduledText">0</span>%</span>
+                                <span id="financialVariance" style="font-weight: bold;">Variance: 0%</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1309,19 +1475,30 @@
                         <div class="form-group">
                             <label class="form-label">GitHub Personal Access Token</label>
                             <input type="password" id="githubToken" class="form-input github-input" 
-                                   placeholder="Enter your GitHub token">
+                                   placeholder="Enter your GitHub token" value="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">
                             <div class="token-info">
-                                Create token at: GitHub → Settings → Developer settings → Personal access tokens<br>
-                                Required scopes: <code>gist</code>
+                                Create token at: github.com/settings/tokens (requires "repo" scope)
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Gist ID (Optional)</label>
-                            <input type="text" id="gistId" class="form-input github-input" 
-                                   placeholder="Leave empty to create new gist">
+                            <label class="form-label">Repository Owner</label>
+                            <input type="text" id="repoOwner" class="form-input github-input" 
+                                   placeholder="Enter repository owner" value="rslegacysb">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Repository Name</label>
+                            <input type="text" id="repoName" class="form-input github-input" 
+                                   placeholder="Enter repository name" value="Gerai-Beluru">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">File Path</label>
+                            <input type="text" id="filePath" class="form-input github-input" 
+                                   placeholder="Enter file path in repository" value="construction_reports_backup.json">
                             <div class="token-info">
-                                If you have an existing gist, enter its ID here
+                                The file will be created or updated in the repository
                             </div>
                         </div>
                         
@@ -1409,7 +1586,7 @@
             <div class="footer">
                 <p>© 2024 Construction Daily Report System</p>
                 <p style="font-size: 0.8rem; margin-top: 5px;">All data stored locally on your device</p>
-                <p style="font-size: 0.8rem; margin-top: 5px;">v4.0 • Secure Access • 1-Page PDF Reports</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">v5.1 • Fixed PDF Overlapping • Auto-Pagination</p>
             </div>
         </div>
     </div>
@@ -1567,12 +1744,22 @@
             
             <div class="form-group">
                 <label class="form-label">GitHub Token</label>
-                <input type="password" id="githubTokenModal" class="form-input" placeholder="Enter GitHub token">
+                <input type="password" id="githubTokenModal" class="form-input" placeholder="Enter GitHub token" value="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">
             </div>
             
             <div class="form-group">
-                <label class="form-label">Gist ID (Optional)</label>
-                <input type="text" id="gistIdModal" class="form-input" placeholder="Leave empty for new gist">
+                <label class="form-label">Repository Owner</label>
+                <input type="text" id="repoOwnerModal" class="form-input" placeholder="Enter repository owner" value="rslegacysb">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Repository Name</label>
+                <input type="text" id="repoNameModal" class="form-input" placeholder="Enter repository name" value="Gerai-Beluru">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">File Path</label>
+                <input type="text" id="filePathModal" class="form-input" placeholder="Enter file path in repository" value="construction_reports_backup.json">
             </div>
             
             <div class="action-buttons">
@@ -1609,6 +1796,10 @@
             ],
             savedReports: [],
             isLoggedIn: false,
+            progress: {
+                physical: { actual: 0, scheduled: 0 },
+                financial: { actual: 0, scheduled: 0 }
+            },
             pdfSettings: {
                 preparedByName: 'Site Supervisor',
                 preparedByDesignation: 'Site Supervisor',
@@ -1617,21 +1808,25 @@
                 companyStamp: ''
             },
             githubConfig: {
-                token: '',
-                gistId: '',
+                token: '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',
+                repoOwner: 'rslegacysb',
+                repoName: 'Gerai-Beluru',
+                filePath: 'construction_reports_backup.json',
                 autoBackup: false,
                 lastBackup: null,
                 backupCount: 0
             },
-            autoBackupInterval: null
+            autoBackupInterval: null,
+            currentReportType: 'daily' // 'daily' or 'monthly'
         };
         
-        // Password System - FIXED PASSWORD
+        // Password System
         const PASSWORD_KEY = 'construction_report_password';
-        const FIXED_PASSWORD = 'rsbeluru'; // Fixed password as requested
+        const FIXED_PASSWORD = 'rsbeluru';
         
         // PDF Type Tracking
         let currentPdfType = '';
+        let currentReportText = '';
         
         // Initialize App
         function initApp() {
@@ -1646,7 +1841,7 @@
             }
         }
         
-        // Simplified Login Functions - FIXED
+        // Login Functions
         function setupLogin() {
             // Initialize with fixed password
             if (!localStorage.getItem(PASSWORD_KEY)) {
@@ -1683,7 +1878,7 @@
                 loginSuccess();
                 errorDiv.style.display = 'none';
             } else {
-                errorDiv.textContent = 'Incorrect password. Use: rsbeluru';
+                errorDiv.textContent = 'Incorrect password';
                 errorDiv.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
@@ -1710,7 +1905,11 @@
             document.getElementById('weatherStart1').value = "08:00";
             document.getElementById('weatherEnd1').value = "17:00";
             
-            showToast('Welcome to Construction Report System!');
+            // Initialize progress indicators
+            updatePhysicalProgress();
+            updateFinancialProgress();
+            
+            showToast('Welcome to Construction Report System v5.1!');
             
             // Start auto-backup if enabled
             if (appData.githubConfig.autoBackup) {
@@ -1742,73 +1941,90 @@
             }
         }
         
-        function showChangePassword() {
-            openModal('passwordModal');
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            document.getElementById('passwordError').style.display = 'none';
+        // Progress Monitoring Functions
+        function updatePhysicalProgress() {
+            const actual = parseFloat(document.getElementById('physicalActual').value) || 0;
+            const scheduled = parseFloat(document.getElementById('physicalScheduled').value) || 0;
+            
+            appData.progress.physical.actual = actual;
+            appData.progress.physical.scheduled = scheduled;
+            
+            // Update display
+            document.getElementById('physicalProgressValue').textContent = `${actual.toFixed(1)}%`;
+            document.getElementById('physicalActualText').textContent = actual.toFixed(1);
+            document.getElementById('physicalScheduledText').textContent = scheduled.toFixed(1);
+            
+            // Update progress bar
+            const progressBar = document.getElementById('physicalProgressBar');
+            progressBar.style.width = `${Math.min(actual, 100)}%`;
+            
+            // Calculate and display variance
+            const variance = actual - scheduled;
+            const varianceElement = document.getElementById('physicalVariance');
+            varianceElement.textContent = `Variance: ${variance.toFixed(1)}%`;
+            varianceElement.style.color = variance >= 0 ? '#27ae60' : '#e74c3c';
+            
+            // Save to storage
+            saveToStorage();
         }
         
-        function changePassword() {
-            const current = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('passwordError');
-            const storedPassword = localStorage.getItem(PASSWORD_KEY);
+        function updateFinancialProgress() {
+            const actual = parseFloat(document.getElementById('financialActual').value) || 0;
+            const scheduled = parseFloat(document.getElementById('financialScheduled').value) || 0;
             
-            // Validation
-            if (!current || !newPass || !confirm) {
-                errorDiv.textContent = 'All fields are required';
-                errorDiv.style.display = 'block';
-                return;
-            }
+            appData.progress.financial.actual = actual;
+            appData.progress.financial.scheduled = scheduled;
             
-            if (current !== storedPassword && current !== FIXED_PASSWORD) {
-                errorDiv.textContent = 'Current password is incorrect';
-                errorDiv.style.display = 'block';
-                return;
-            }
+            // Update display
+            document.getElementById('financialProgressValue').textContent = `${actual.toFixed(1)}%`;
+            document.getElementById('financialActualText').textContent = actual.toFixed(1);
+            document.getElementById('financialScheduledText').textContent = scheduled.toFixed(1);
             
-            if (newPass.length < 6) {
-                errorDiv.textContent = 'New password must be at least 6 characters';
-                errorDiv.style.display = 'block';
-                return;
-            }
+            // Update progress bar
+            const progressBar = document.getElementById('financialProgressBar');
+            progressBar.style.width = `${Math.min(actual, 100)}%`;
             
-            if (newPass !== confirm) {
-                errorDiv.textContent = 'New passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
+            // Calculate and display variance
+            const variance = actual - scheduled;
+            const varianceElement = document.getElementById('financialVariance');
+            varianceElement.textContent = `Variance: ${variance.toFixed(1)}%`;
+            varianceElement.style.color = variance >= 0 ? '#27ae60' : '#e74c3c';
             
-            // Save new password
-            localStorage.setItem(PASSWORD_KEY, newPass);
-            showToast('Password changed successfully');
-            closeModal();
+            // Save to storage
+            saveToStorage();
         }
         
-        // GitHub Storage Functions
+        // GitHub Configuration
         function loadGitHubConfig() {
             const saved = localStorage.getItem('githubConfig');
             if (saved) {
-                appData.githubConfig = JSON.parse(saved);
-                
-                // Update UI
-                document.getElementById('githubToken').value = appData.githubConfig.token || '';
-                document.getElementById('gistId').value = appData.githubConfig.gistId || '';
-                document.getElementById('autoBackup').checked = appData.githubConfig.autoBackup || false;
-                
-                updateBackupStats();
+                const savedConfig = JSON.parse(saved);
+                appData.githubConfig = {
+                    ...appData.githubConfig,
+                    ...savedConfig
+                };
             }
+            
+            // Update UI
+            document.getElementById('githubToken').value = appData.githubConfig.token;
+            document.getElementById('repoOwner').value = appData.githubConfig.repoOwner;
+            document.getElementById('repoName').value = appData.githubConfig.repoName;
+            document.getElementById('filePath').value = appData.githubConfig.filePath;
+            document.getElementById('autoBackup').checked = appData.githubConfig.autoBackup || false;
+            
+            updateBackupStats();
         }
         
         function saveGitHubConfig() {
             const token = document.getElementById('githubToken').value.trim();
-            const gistId = document.getElementById('gistId').value.trim();
+            const repoOwner = document.getElementById('repoOwner').value.trim();
+            const repoName = document.getElementById('repoName').value.trim();
+            const filePath = document.getElementById('filePath').value.trim();
             
             appData.githubConfig.token = token;
-            appData.githubConfig.gistId = gistId;
+            appData.githubConfig.repoOwner = repoOwner;
+            appData.githubConfig.repoName = repoName;
+            appData.githubConfig.filePath = filePath;
             
             localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
             
@@ -1831,366 +2047,6 @@
             
             // Update stats
             updateBackupStats();
-        }
-        
-        function testGitHubConnection() {
-            const token = document.getElementById('githubToken').value.trim();
-            
-            if (!token) {
-                const statusDiv = document.getElementById('githubStatus');
-                statusDiv.textContent = '❌ Please enter a GitHub token';
-                statusDiv.className = 'github-status github-error';
-                statusDiv.style.display = 'block';
-                return;
-            }
-            
-            // Test connection by getting user info
-            fetch('https://api.github.com/user', {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            })
-            .then(response => {
-                const statusDiv = document.getElementById('githubStatus');
-                if (response.ok) {
-                    return response.json().then(user => {
-                        statusDiv.innerHTML = `✅ Connected successfully!<br>GitHub User: ${user.login}<br>Name: ${user.name || 'Not set'}`;
-                        statusDiv.className = 'github-status github-success';
-                        statusDiv.style.display = 'block';
-                        showToast('GitHub connection successful');
-                    });
-                } else {
-                    throw new Error('Connection failed');
-                }
-            })
-            .catch(error => {
-                const statusDiv = document.getElementById('githubStatus');
-                statusDiv.textContent = '❌ Connection failed. Please check your token.';
-                statusDiv.className = 'github-status github-error';
-                statusDiv.style.display = 'block';
-                showToast('GitHub connection failed', 'error');
-            });
-        }
-        
-        async function backupToGitHub() {
-            const token = appData.githubConfig.token;
-            
-            if (!token) {
-                showToast('Please configure GitHub token first', 'error');
-                switchTab('github');
-                return;
-            }
-            
-            try {
-                showToast('Backing up to GitHub...');
-                
-                // Prepare data to backup
-                const backupData = {
-                    savedReports: JSON.parse(localStorage.getItem('savedReports') || '[]'),
-                    constructionReportData: localStorage.getItem('constructionReportData'),
-                    pdfSettings: localStorage.getItem('pdfSettings'),
-                    lastBackup: new Date().toISOString()
-                };
-                
-                const content = JSON.stringify(backupData, null, 2);
-                const filename = 'construction_reports_backup.json';
-                
-                let gistId = appData.githubConfig.gistId;
-                let response;
-                
-                if (gistId) {
-                    // Update existing gist
-                    response = await fetch(`https://api.github.com/gists/${gistId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `token ${token}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify({
-                            description: `Construction Reports Backup - ${new Date().toLocaleDateString()}`,
-                            files: {
-                                [filename]: {
-                                    content: content
-                                }
-                            }
-                        })
-                    });
-                } else {
-                    // Create new gist
-                    response = await fetch('https://api.github.com/gists', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${token}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify({
-                            description: 'Construction Daily Reports Backup',
-                            public: false,
-                            files: {
-                                [filename]: {
-                                    content: content
-                                }
-                            }
-                        })
-                    });
-                }
-                
-                if (response.ok) {
-                    const gist = await response.json();
-                    
-                    // Save new gist ID if created
-                    if (!appData.githubConfig.gistId) {
-                        appData.githubConfig.gistId = gist.id;
-                        document.getElementById('gistId').value = gist.id;
-                        localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
-                    }
-                    
-                    // Update backup stats
-                    appData.githubConfig.lastBackup = new Date().toISOString();
-                    appData.githubConfig.backupCount = (appData.githubConfig.backupCount || 0) + 1;
-                    localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
-                    
-                    showToast('✅ Backup successful!');
-                    updateBackupStatus();
-                    updateBackupStats();
-                    
-                    // Show success in GitHub tab
-                    const statusDiv = document.getElementById('githubStatus');
-                    statusDiv.innerHTML = `✅ Backup completed successfully!<br>
-                                         Gist: ${gist.id}<br>
-                                         URL: <a href="${gist.html_url}" target="_blank">${gist.html_url}</a>`;
-                    statusDiv.className = 'github-status github-success';
-                    statusDiv.style.display = 'block';
-                    
-                } else {
-                    throw new Error(`GitHub API error: ${response.status}`);
-                }
-                
-            } catch (error) {
-                console.error('Backup error:', error);
-                showToast('Backup failed: ' + error.message, 'error');
-                
-                const statusDiv = document.getElementById('githubStatus');
-                statusDiv.textContent = `❌ Backup failed: ${error.message}`;
-                statusDiv.className = 'github-status github-error';
-                statusDiv.style.display = 'block';
-            }
-        }
-        
-        async function restoreFromGitHub() {
-            const token = appData.githubConfig.token;
-            const gistId = appData.githubConfig.gistId;
-            
-            if (!token || !gistId) {
-                showToast('Please configure GitHub token and Gist ID first', 'error');
-                return;
-            }
-            
-            if (!confirm('This will overwrite your current data. Continue?')) {
-                return;
-            }
-            
-            try {
-                showToast('Restoring from GitHub...');
-                
-                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const gist = await response.json();
-                    const files = gist.files;
-                    const filename = Object.keys(files).find(name => name.includes('backup'));
-                    
-                    if (filename) {
-                        const file = files[filename];
-                        const backupData = JSON.parse(file.content);
-                        
-                        // Restore data
-                        if (backupData.savedReports) {
-                            localStorage.setItem('savedReports', JSON.stringify(backupData.savedReports));
-                        }
-                        if (backupData.constructionReportData) {
-                            localStorage.setItem('constructionReportData', backupData.constructionReportData);
-                        }
-                        if (backupData.pdfSettings) {
-                            localStorage.setItem('pdfSettings', backupData.pdfSettings);
-                        }
-                        
-                        // Reload data
-                        loadFromStorage();
-                        loadSavedReports();
-                        
-                        showToast('✅ Restore successful!');
-                        
-                        const statusDiv = document.getElementById('githubStatus');
-                        statusDiv.textContent = `✅ Restore completed successfully! Restored ${backupData.savedReports?.length || 0} reports.`;
-                        statusDiv.className = 'github-status github-success';
-                        statusDiv.style.display = 'block';
-                        
-                    } else {
-                        throw new Error('No backup file found in gist');
-                    }
-                    
-                } else {
-                    throw new Error(`GitHub API error: ${response.status}`);
-                }
-                
-            } catch (error) {
-                console.error('Restore error:', error);
-                showToast('Restore failed: ' + error.message, 'error');
-                
-                const statusDiv = document.getElementById('githubStatus');
-                statusDiv.textContent = `❌ Restore failed: ${error.message}`;
-                statusDiv.className = 'github-status github-error';
-                statusDiv.style.display = 'block';
-            }
-        }
-        
-        function clearGitHubConfig() {
-            if (confirm('Clear GitHub configuration?')) {
-                appData.githubConfig = {
-                    token: '',
-                    gistId: '',
-                    autoBackup: false,
-                    lastBackup: null,
-                    backupCount: 0
-                };
-                localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
-                
-                document.getElementById('githubToken').value = '';
-                document.getElementById('gistId').value = '';
-                document.getElementById('autoBackup').checked = false;
-                
-                // Stop auto-backup
-                stopAutoBackup();
-                
-                showToast('GitHub configuration cleared');
-                updateBackupStatus();
-                updateBackupStats();
-            }
-        }
-        
-        function toggleAutoBackup() {
-            const enabled = document.getElementById('autoBackup').checked;
-            appData.githubConfig.autoBackup = enabled;
-            localStorage.setItem('githubConfig', JSON.stringify(appData.githubConfig));
-            
-            if (enabled && appData.githubConfig.token) {
-                startAutoBackup();
-                showToast('Auto-backup enabled');
-            } else {
-                stopAutoBackup();
-                showToast('Auto-backup disabled');
-            }
-            
-            updateBackupStatus();
-        }
-        
-        function startAutoBackup() {
-            // Clear existing interval
-            if (appData.autoBackupInterval) {
-                clearInterval(appData.autoBackupInterval);
-            }
-            
-            // Start new interval (every 5 minutes)
-            appData.autoBackupInterval = setInterval(() => {
-                if (appData.githubConfig.token && appData.isLoggedIn) {
-                    backupToGitHub();
-                }
-            }, 5 * 60 * 1000); // 5 minutes
-            
-            updateBackupStatus();
-        }
-        
-        function stopAutoBackup() {
-            if (appData.autoBackupInterval) {
-                clearInterval(appData.autoBackupInterval);
-                appData.autoBackupInterval = null;
-            }
-            
-            updateBackupStatus();
-        }
-        
-        function updateBackupStatus() {
-            const indicator = document.getElementById('backupIndicator');
-            const statusText = document.getElementById('backupStatusText');
-            
-            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
-                indicator.className = 'backup-indicator active';
-                statusText.textContent = 'Auto-save: Enabled';
-            } else {
-                indicator.className = 'backup-indicator';
-                statusText.textContent = 'Auto-save: Disabled';
-            }
-        }
-        
-        function updateBackupStats() {
-            const statsContent = document.getElementById('statsContent');
-            const lastBackup = appData.githubConfig.lastBackup 
-                ? new Date(appData.githubConfig.lastBackup).toLocaleString() 
-                : 'Never';
-            
-            statsContent.innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
-                        <div style="font-size: 0.9rem; color: #666;">Total Backups</div>
-                        <div style="font-size: 1.2rem; font-weight: bold; color: #3498db;">${appData.githubConfig.backupCount || 0}</div>
-                    </div>
-                    <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
-                        <div style="font-size: 0.9rem; color: #666;">Last Backup</div>
-                        <div style="font-size: 1rem; font-weight: bold; color: #27ae60;">${lastBackup}</div>
-                    </div>
-                </div>
-                ${appData.githubConfig.gistId ? `
-                <div style="margin-top: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e5eb;">
-                    <div style="font-size: 0.9rem; color: #666;">Gist ID</div>
-                    <div style="font-size: 0.9rem; font-family: monospace; word-break: break-all;">${appData.githubConfig.gistId}</div>
-                </div>
-                ` : ''}
-            `;
-        }
-        
-        function backupSavedReports() {
-            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            if (savedReports.length === 0) {
-                showToast('No reports to backup', 'error');
-                return;
-            }
-            backupToGitHub();
-        }
-        
-        function showBackupHistory() {
-            const reports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            const statsContent = document.getElementById('statsContent');
-            
-            if (reports.length === 0) {
-                statsContent.innerHTML = '<p style="color: #666; text-align: center;">No backup history available</p>';
-                return;
-            }
-            
-            let html = '<div style="max-height: 300px; overflow-y: auto;">';
-            reports.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10).forEach(report => {
-                const date = new Date(report.timestamp).toLocaleString();
-                html += `
-                    <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e1e5eb;">
-                        <div style="font-weight: bold;">${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}</div>
-                        <div style="font-size: 0.8rem; color: #666;">Backed up: ${date}</div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            statsContent.innerHTML = html;
-        }
-        
-        function showGitHubConfig() {
-            switchTab('github');
         }
         
         // Tab Switching
@@ -2222,8 +2078,8 @@
         function useToday() {
             appData.currentDate = new Date();
             updateDateDisplay();
+            loadFromStorage();
             showToast('Date set to today');
-            saveToStorage();
         }
         
         function showDatePicker() {
@@ -2234,10 +2090,17 @@
         
         function setSelectedDate() {
             const datePicker = document.getElementById('datePicker');
-            appData.currentDate = new Date(datePicker.value);
+            const newDate = new Date(datePicker.value);
+            
+            if (isNaN(newDate.getTime())) {
+                showToast('Invalid date selected', 'error');
+                return;
+            }
+            
+            appData.currentDate = newDate;
             updateDateDisplay();
             closeModal();
-            saveToStorage();
+            loadFromStorage();
             showToast('Date updated successfully');
         }
         
@@ -2272,26 +2135,6 @@
             `;
             container.appendChild(newCard);
             saveToStorage();
-        }
-        
-        function getWeatherData() {
-            const weatherData = [];
-            for (let i = 1; i <= appData.weatherPeriods; i++) {
-                const startTime = document.getElementById(`weatherStart${i}`)?.value;
-                const endTime = document.getElementById(`weatherEnd${i}`)?.value;
-                const condition = document.getElementById(`weatherCondition${i}`)?.value;
-                const notes = document.getElementById(`weatherNotes${i}`)?.value;
-                
-                if (startTime && endTime && condition) {
-                    weatherData.push({
-                        start: startTime,
-                        end: endTime,
-                        condition: condition,
-                        notes: notes || ''
-                    });
-                }
-            }
-            return weatherData;
         }
         
         // Manpower Functions
@@ -2366,6 +2209,12 @@
                 report += `DAILY CONSTRUCTION REPORT\n\n`;
                 report += `Date: ${formattedDate}\n`;
                 report += `Day: ${dayOfWeek}\n\n`;
+                
+                // Add Progress Section
+                report += `PROGRESS MONITORING:\n`;
+                report += `Physical Progress: ${appData.progress.physical.actual.toFixed(1)}% (Actual) / ${appData.progress.physical.scheduled.toFixed(1)}% (Scheduled)\n`;
+                report += `Financial Progress: ${appData.progress.financial.actual.toFixed(1)}% (Actual) / ${appData.progress.financial.scheduled.toFixed(1)}% (Scheduled)\n\n`;
+                
                 report += `WEATHER CONDITIONS:\n`;
                 
                 if (weatherData.length > 0) {
@@ -2436,6 +2285,9 @@
                 report += `\n\n--- END OF REPORT ---\n`;
                 report += `Generated: ${new Date().toLocaleString()}`;
                 
+                currentReportText = report;
+                appData.currentReportType = 'daily';
+                
                 document.getElementById('reportOutput').textContent = report;
                 document.getElementById('reportCard').style.display = 'block';
                 document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' });
@@ -2447,91 +2299,7 @@
             }
         }
         
-        function getListValues(containerId) {
-            const inputs = document.querySelectorAll(`#${containerId} .list-input`);
-            return Array.from(inputs)
-                .map(input => input.value.trim())
-                .filter(value => value);
-        }
-        
-        function formatDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-        
-        function formatDateForFile(date) {
-            const d = new Date(date);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        
-        // PDF Settings Functions
-        function loadPdfSettings() {
-            const saved = localStorage.getItem('pdfSettings');
-            if (saved) {
-                appData.pdfSettings = JSON.parse(saved);
-            }
-            
-            // Update form inputs
-            document.getElementById('preparedByName').value = appData.pdfSettings.preparedByName;
-            document.getElementById('preparedByDesignation').value = appData.pdfSettings.preparedByDesignation;
-            document.getElementById('witnessedByName').value = appData.pdfSettings.witnessedByName;
-            document.getElementById('witnessedByDesignation').value = appData.pdfSettings.witnessedByDesignation;
-            document.getElementById('companyStamp').value = appData.pdfSettings.companyStamp;
-        }
-        
-        function savePdfSettings() {
-            appData.pdfSettings = {
-                preparedByName: document.getElementById('preparedByName').value,
-                preparedByDesignation: document.getElementById('preparedByDesignation').value,
-                witnessedByName: document.getElementById('witnessedByName').value,
-                witnessedByDesignation: document.getElementById('witnessedByDesignation').value,
-                companyStamp: document.getElementById('companyStamp').value
-            };
-            
-            localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
-            return true;
-        }
-        
-        function showPdfSettings(type) {
-            currentPdfType = type;
-            
-            if (type === 'daily') {
-                const report = document.getElementById('reportOutput').textContent;
-                if (!report || report.includes('Report will appear here')) {
-                    showToast('Please generate a report first', 'error');
-                    return;
-                }
-            } else if (type === 'monthly') {
-                const report = document.getElementById('monthlyReportOutput').textContent;
-                if (!report || report.includes('Monthly report will appear here')) {
-                    showToast('Please generate a monthly report first', 'error');
-                    return;
-                }
-            }
-            
-            openModal('pdfSettingsModal');
-        }
-        
-        function generatePDFBasedOnType() {
-            if (!savePdfSettings()) {
-                return;
-            }
-            
-            if (currentPdfType === 'daily') {
-                exportToPDF();
-            } else if (currentPdfType === 'monthly') {
-                exportMonthlyToPDF();
-            }
-            
-            closeModal();
-        }
-        
-        // Enhanced 1-Page A4 PDF Export
+        // FIXED PDF Generation with proper pagination
         function exportToPDF() {
             try {
                 const { jsPDF } = window.jspdf;
@@ -2543,46 +2311,90 @@
                 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 10;
-                let yPos = 8;
+                const margin = 15;
+                let yPos = 15;
                 
                 // Header
-                doc.setFontSize(12);
+                doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
                 doc.text('DAILY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
-                yPos += 5;
+                yPos += 6;
                 
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
                 doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
                 yPos += 4;
                 
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
-                yPos += 8;
+                yPos += 10;
                 
                 // Date
                 const date = appData.currentDate;
                 const formattedDate = formatDate(date);
                 const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
                 
-                doc.setFontSize(9);
+                doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
                 doc.text(`Date: ${formattedDate}`, margin, yPos);
                 doc.text(`Day: ${dayOfWeek}`, pageWidth - margin, yPos, { align: 'right' });
-                yPos += 6;
-                
-                // Horizontal line
-                doc.setLineWidth(0.5);
-                doc.line(margin, yPos, pageWidth - margin, yPos);
                 yPos += 8;
                 
-                // Weather Table
-                doc.setFontSize(9);
+                // Line
+                doc.setLineWidth(0.5);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 10;
+                
+                // Function to check and add new page
+                function checkPageBreak(spaceNeeded) {
+                    if (yPos + spaceNeeded > pageHeight - 20) {
+                        doc.addPage();
+                        yPos = 15;
+                        return true;
+                    }
+                    return false;
+                }
+                
+                // 1. Progress Monitoring
+                checkPageBreak(30);
+                doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
-                doc.text('1. WEATHER CONDITIONS', margin, yPos);
-                yPos += 5;
+                doc.text('1. PROGRESS MONITORING', margin, yPos);
+                yPos += 6;
+                
+                const progressData = [
+                    ['Physical Progress', `${appData.progress.physical.actual.toFixed(1)}%`, `${appData.progress.physical.scheduled.toFixed(1)}%`],
+                    ['Financial Progress', `${appData.progress.financial.actual.toFixed(1)}%`, `${appData.progress.financial.scheduled.toFixed(1)}%`]
+                ];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Type', 'Actual', 'Scheduled']],
+                    body: progressData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 8,
+                        cellPadding: 3,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [155, 89, 182], 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // 2. Weather Conditions
+                checkPageBreak(30);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('2. WEATHER CONDITIONS', margin, yPos);
+                yPos += 6;
                 
                 const weatherData = getWeatherData();
                 if (weatherData.length > 0) {
@@ -2594,42 +2406,38 @@
                     
                     doc.autoTable({
                         startY: yPos,
-                        head: [['Time Period', 'Condition', 'Remarks']],
+                        head: [['Time', 'Condition', 'Notes']],
                         body: weatherTableData,
                         margin: { left: margin, right: margin },
                         styles: { 
-                            fontSize: 7,
-                            cellPadding: 2,
+                            fontSize: 8,
+                            cellPadding: 3,
                             lineWidth: 0.1
                         },
                         headStyles: { 
                             fillColor: [52, 152, 219], 
-                            textColor: 255, 
+                            textColor: [255, 255, 255], 
                             fontStyle: 'bold',
-                            fontSize: 7
+                            fontSize: 8
                         },
                         alternateRowStyles: { fillColor: [245, 245, 245] },
-                        tableWidth: 'wrap',
-                        columnStyles: {
-                            0: { cellWidth: 30 },
-                            1: { cellWidth: 30 },
-                            2: { cellWidth: pageWidth - 2*margin - 60 }
-                        }
+                        tableWidth: 'wrap'
                     });
                     
-                    yPos = doc.lastAutoTable.finalY + 5;
+                    yPos = doc.lastAutoTable.finalY + 10;
                 } else {
-                    doc.setFontSize(8);
+                    doc.setFontSize(9);
                     doc.setFont('helvetica', 'normal');
                     doc.text('No weather data recorded', margin + 5, yPos);
-                    yPos += 8;
+                    yPos += 15;
                 }
                 
-                // Manpower Table
-                doc.setFontSize(9);
+                // 3. Manpower
+                checkPageBreak(30);
+                doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
-                doc.text('2. MANPOWER ON SITE', margin, yPos);
-                yPos += 5;
+                doc.text('3. MANPOWER ON SITE', margin, yPos);
+                yPos += 6;
                 
                 const manpowerData = appData.manpower
                     .filter(p => p.value > 0)
@@ -2637,245 +2445,274 @@
                 
                 const totalManpower = appData.manpower.reduce((sum, p) => sum + p.value, 0);
                 if (manpowerData.length > 0) {
-                    manpowerData.push(['TOTAL MANPOWER', totalManpower.toString()]);
+                    manpowerData.push(['TOTAL', totalManpower.toString()]);
                     
                     doc.autoTable({
                         startY: yPos,
-                        head: [['Position', 'No. of Workers']],
+                        head: [['Position', 'Quantity']],
                         body: manpowerData,
                         margin: { left: margin, right: margin },
                         styles: { 
-                            fontSize: 7,
-                            cellPadding: 2,
+                            fontSize: 8,
+                            cellPadding: 3,
                             lineWidth: 0.1
                         },
                         headStyles: { 
-                            fillColor: [52, 152, 219], 
-                            textColor: 255, 
+                            fillColor: [46, 134, 222], 
+                            textColor: [255, 255, 255], 
                             fontStyle: 'bold',
-                            fontSize: 7
+                            fontSize: 8
                         },
                         alternateRowStyles: { fillColor: [245, 245, 245] },
                         tableWidth: 'wrap'
                     });
                     
-                    yPos = doc.lastAutoTable.finalY + 5;
+                    yPos = doc.lastAutoTable.finalY + 10;
                 } else {
-                    doc.setFontSize(8);
+                    doc.setFontSize(9);
                     doc.setFont('helvetica', 'normal');
                     doc.text('No manpower recorded', margin + 5, yPos);
-                    yPos += 8;
+                    yPos += 15;
                 }
                 
-                // Materials Table
-                doc.setFontSize(9);
+                // 4. Materials
+                checkPageBreak(20);
+                doc.setFontSize(10);
                 doc.setFont('helvetica', 'bold');
-                doc.text('3. CONSTRUCTION MATERIALS ON SITE', margin, yPos);
-                yPos += 5;
+                doc.text('4. CONSTRUCTION MATERIALS', margin, yPos);
+                yPos += 6;
                 
                 const materials = getListValues('materialList').filter(m => m !== 'NIL');
                 const materialData = materials.length > 0 ? 
-                    materials.slice(0, 4).map(m => [m]) :
-                    [['No materials on site']];
+                    materials.map((m, i) => [`${i + 1}.`, m]) : 
+                    [['1.', 'No materials on site']];
                 
                 doc.autoTable({
                     startY: yPos,
-                    head: [['Material Description']],
+                    head: [['No.', 'Description']],
                     body: materialData,
                     margin: { left: margin, right: margin },
                     styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
+                        fontSize: 8,
+                        cellPadding: 3,
                         lineWidth: 0.1
                     },
                     headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
+                        fillColor: [46, 134, 222], 
+                        textColor: [255, 255, 255], 
                         fontStyle: 'bold',
-                        fontSize: 7
+                        fontSize: 8
                     },
                     alternateRowStyles: { fillColor: [245, 245, 245] },
-                    tableWidth: 'wrap'
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Machinery Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('4. MACHINERY AND EQUIPMENT', margin, yPos);
-                yPos += 5;
-                
-                const machinery = getListValues('machineryList');
-                const machineryData = machinery.length > 0 ? 
-                    machinery.slice(0, 4).map(m => [m]) :
-                    [['No machinery on site']];
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Machinery / Equipment']],
-                    body: machineryData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    tableWidth: 'wrap'
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Activities Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('5. SITE ACTIVITIES', margin, yPos);
-                yPos += 5;
-                
-                const activities = getListValues('activityList').filter(a => a !== 'No Activity');
-                const activityData = activities.length > 0 ? 
-                    activities.slice(0, 4).map(a => [a]) :
-                    [['No activities recorded']];
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Activity Description']],
-                    body: activityData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    tableWidth: 'wrap'
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Works Done Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('6. WORKS COMPLETED', margin, yPos);
-                yPos += 5;
-                
-                const works = getListValues('worksList').filter(w => w !== 'N/A');
-                const workData = works.length > 0 ? 
-                    works.slice(0, 4).map(w => [w]) :
-                    [['No works completed']];
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Completed Work']],
-                    body: workData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    tableWidth: 'wrap'
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Remarks Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('7. REMARKS', margin, yPos);
-                yPos += 5;
-                
-                const remarks = getListValues('remarksList').filter(r => r !== 'N/A');
-                const remarkData = remarks.length > 0 ? 
-                    remarks.slice(0, 3).map(r => [r]) :
-                    [['No remarks']];
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Remarks / Observations']],
-                    body: remarkData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    tableWidth: 'wrap'
+                    tableWidth: 'wrap',
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 'auto' }
+                    }
                 });
                 
                 yPos = doc.lastAutoTable.finalY + 10;
                 
-                // Signatory Section
-                const signatoryY = Math.min(yPos, 240);
+                // 5. Machinery
+                checkPageBreak(20);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('5. MACHINERY & EQUIPMENT', margin, yPos);
+                yPos += 6;
+                
+                const machinery = getListValues('machineryList');
+                const machineryData = machinery.length > 0 ? 
+                    machinery.map((m, i) => [`${i + 1}.`, m]) : 
+                    [['1.', 'No machinery on site']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['No.', 'Description']],
+                    body: machineryData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 8,
+                        cellPadding: 3,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [46, 134, 222], 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap',
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 'auto' }
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // 6. Activities
+                checkPageBreak(20);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('6. SITE ACTIVITIES', margin, yPos);
+                yPos += 6;
+                
+                const activities = getListValues('activityList').filter(a => a !== 'No Activity');
+                const activityData = activities.length > 0 ? 
+                    activities.map((a, i) => [`${i + 1}.`, a]) : 
+                    [['1.', 'No activities recorded']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['No.', 'Description']],
+                    body: activityData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 8,
+                        cellPadding: 3,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [46, 134, 222], 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap',
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 'auto' }
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // 7. Works Done
+                checkPageBreak(20);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('7. WORKS COMPLETED', margin, yPos);
+                yPos += 6;
+                
+                const works = getListValues('worksList').filter(w => w !== 'N/A');
+                const workData = works.length > 0 ? 
+                    works.map((w, i) => [`${i + 1}.`, w]) : 
+                    [['1.', 'No works completed']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['No.', 'Description']],
+                    body: workData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 8,
+                        cellPadding: 3,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [46, 134, 222], 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap',
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 'auto' }
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // 8. Remarks
+                checkPageBreak(20);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('8. REMARKS', margin, yPos);
+                yPos += 6;
+                
+                const remarks = getListValues('remarksList').filter(r => r !== 'N/A');
+                const remarkData = remarks.length > 0 ? 
+                    remarks.map((r, i) => [`${i + 1}.`, r]) : 
+                    [['1.', 'No remarks']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['No.', 'Remarks']],
+                    body: remarkData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 8,
+                        cellPadding: 3,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [46, 134, 222], 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap',
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 'auto' }
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 15;
+                
+                // Signatories - Ensure they're on the same page
+                if (yPos > pageHeight - 40) {
+                    doc.addPage();
+                    yPos = 15;
+                }
                 
                 // Prepared By
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
-                doc.text('Prepared By:', margin, signatoryY);
+                doc.text('Prepared By:', margin, yPos);
                 doc.setFont('helvetica', 'normal');
-                doc.line(margin, signatoryY + 2, margin + 40, signatoryY + 2);
-                doc.setFontSize(7);
-                doc.text(appData.pdfSettings.preparedByName, margin, signatoryY + 6);
-                doc.text(appData.pdfSettings.preparedByDesignation, margin, signatoryY + 10);
+                doc.line(margin, yPos + 2, margin + 40, yPos + 2);
+                doc.setFontSize(8);
+                doc.text(appData.pdfSettings.preparedByName || 'Site Supervisor', margin, yPos + 6);
+                doc.text(appData.pdfSettings.preparedByDesignation || 'Site Supervisor', margin, yPos + 10);
                 
                 // Witnessed By
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
-                doc.text('Witnessed By:', pageWidth - margin - 40, signatoryY);
+                doc.text('Witnessed By:', pageWidth - margin - 40, yPos);
                 doc.setFont('helvetica', 'normal');
-                doc.line(pageWidth - margin - 40, signatoryY + 2, pageWidth - margin, signatoryY + 2);
-                doc.setFontSize(7);
-                doc.text(appData.pdfSettings.witnessedByName, pageWidth - margin - 40, signatoryY + 6);
-                doc.text(appData.pdfSettings.witnessedByDesignation, pageWidth - margin - 40, signatoryY + 10);
+                doc.line(pageWidth - margin - 40, yPos + 2, pageWidth - margin, yPos + 2);
+                doc.setFontSize(8);
+                doc.text(appData.pdfSettings.witnessedByName || 'Project Manager', pageWidth - margin - 40, yPos + 6);
+                doc.text(appData.pdfSettings.witnessedByDesignation || 'Project Manager', pageWidth - margin - 40, yPos + 10);
                 
                 // Company Stamp
                 if (appData.pdfSettings.companyStamp) {
-                    doc.setFontSize(6);
+                    doc.setFontSize(7);
                     doc.setFont('helvetica', 'italic');
-                    doc.text(`Stamp: ${appData.pdfSettings.companyStamp}`, pageWidth / 2, signatoryY + 15, { align: 'center' });
+                    doc.text(`Company Stamp: ${appData.pdfSettings.companyStamp}`, pageWidth / 2, yPos + 15, { align: 'center' });
                 }
                 
                 // Footer
-                doc.setFontSize(6);
+                doc.setFontSize(7);
                 doc.setFont('helvetica', 'italic');
-                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
                 
                 // Save PDF
                 const dateStr = formatDateForFile(date);
-                doc.save(`Daily_Report_${dateStr}.pdf`);
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.save(`Daily_Report_${dateStr}_${pageCount}_pages.pdf`);
                 
-                showToast('Daily PDF exported successfully (1 page)');
+                showToast(`Daily PDF exported successfully (${pageCount} page${pageCount > 1 ? 's' : ''})`);
                 
             } catch (error) {
                 console.error('PDF export error:', error);
-                showToast('Error exporting PDF. Please try again.', 'error');
+                showToast('Error exporting PDF: ' + error.message, 'error');
             }
         }
         
@@ -2913,211 +2750,80 @@
                 return;
             }
             
-            // Sort by date
-            monthlyReports.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
             // Calculate statistics
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
             
-            let totalManpowerDays = 0;
-            let maxManpower = 0;
-            let minManpower = Infinity;
-            let rainyDays = 0;
-            let sunnyDays = 0;
-            let cloudyDays = 0;
-            let totalMaterials = new Set();
-            let totalMachinery = new Set();
+            let reportText = `MONTHLY CONSTRUCTION REPORT\n`;
+            reportText += `========================================\n\n`;
+            reportText += `Project: GERAI BERSEPADU BELURU\n`;
+            reportText += `Location: LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI\n`;
+            reportText += `Period: ${monthNames[month - 1]} ${year}\n`;
+            reportText += `Total Working Days: ${monthlyReports.length}\n\n`;
             
-            monthlyReports.forEach(report => {
-                const lines = report.report.split('\n');
-                let dailyManpower = 0;
-                let hasRain = false;
-                
-                lines.forEach(line => {
-                    // Extract manpower
-                    if (line.includes(':') && !line.includes('Time') && !line.includes('Total')) {
-                        const match = line.match(/: (\d+)$/);
-                        if (match) {
-                            dailyManpower += parseInt(match[1]);
-                        }
-                    }
-                    
-                    // Check for rain
-                    if (line.includes('Rain') || line.includes('rain')) {
-                        hasRain = true;
-                    }
-                    
-                    // Extract materials
-                    if (line.includes('.') && (line.includes('Cement') || line.includes('Brick') || line.includes('Steel') || line.includes('Sand'))) {
-                        const material = line.substring(line.indexOf('.') + 2);
-                        totalMaterials.add(material);
-                    }
-                    
-                    // Extract machinery
-                    if (line.includes('.') && (line.includes('Excavator') || line.includes('Crane') || line.includes('Loader') || line.includes('Dozer'))) {
-                        const machine = line.substring(line.indexOf('.') + 2);
-                        totalMachinery.add(machine);
-                    }
-                });
-                
-                totalManpowerDays += dailyManpower;
-                maxManpower = Math.max(maxManpower, dailyManpower);
-                minManpower = Math.min(minManpower, dailyManpower);
-                
-                if (hasRain) rainyDays++;
-                if (lines.some(l => l.includes('Sunny'))) sunnyDays++;
-                if (lines.some(l => l.includes('Cloudy'))) cloudyDays++;
-            });
-            
-            const avgManpower = Math.round(totalManpowerDays / monthlyReports.length);
-            
-            // Generate monthly report
-            let monthlyReport = `MONTHLY CONSTRUCTION REPORT\n`;
-            monthlyReport += `========================================\n\n`;
-            monthlyReport += `Project: GERAI BERSEPADU BELURU\n`;
-            monthlyReport += `Location: LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI\n`;
-            monthlyReport += `Period: ${monthNames[month - 1]} ${year}\n\n`;
-            monthlyReport += `========================================\n`;
-            monthlyReport += `MONTHLY SUMMARY STATISTICS\n`;
-            monthlyReport += `========================================\n\n`;
-            
-            monthlyReport += `Total Working Days: ${monthlyReports.length}\n`;
-            monthlyReport += `Rainy Days: ${rainyDays}\n`;
-            monthlyReport += `Sunny Days: ${sunnyDays}\n`;
-            monthlyReport += `Cloudy Days: ${cloudyDays}\n`;
-            monthlyReport += `Average Daily Manpower: ${avgManpower}\n`;
-            monthlyReport += `Maximum Manpower (single day): ${maxManpower}\n`;
-            monthlyReport += `Minimum Manpower (single day): ${minManpower}\n`;
-            monthlyReport += `Total Manpower Days: ${totalManpowerDays}\n\n`;
-            
-            monthlyReport += `========================================\n`;
-            monthlyReport += `MATERIALS USED THIS MONTH\n`;
-            monthlyReport += `========================================\n\n`;
-            
-            if (totalMaterials.size > 0) {
-                Array.from(totalMaterials).forEach((material, i) => {
-                    monthlyReport += `${i + 1}. ${material}\n`;
-                });
-            } else {
-                monthlyReport += `No materials recorded\n`;
-            }
-            
-            monthlyReport += `\n========================================\n`;
-            monthlyReport += `MACHINERY USED THIS MONTH\n`;
-            monthlyReport += `========================================\n\n`;
-            
-            if (totalMachinery.size > 0) {
-                Array.from(totalMachinery).forEach((machine, i) => {
-                    monthlyReport += `${i + 1}. ${machine}\n`;
-                });
-            } else {
-                monthlyReport += `No machinery recorded\n`;
-            }
-            
-            monthlyReport += `\n========================================\n`;
-            monthlyReport += `DAILY REPORT SUMMARY\n`;
-            monthlyReport += `========================================\n\n`;
+            reportText += `========================================\n`;
+            reportText += `DAILY REPORTS SUMMARY\n`;
+            reportText += `========================================\n\n`;
             
             monthlyReports.forEach((report, index) => {
                 const reportDate = new Date(report.date);
                 const formattedDate = formatDate(reportDate);
-                monthlyReport += `Day ${index + 1}: ${formattedDate}\n`;
                 
-                // Extract first few lines for summary
-                const lines = report.report.split('\n');
-                const summaryLines = lines.slice(0, 5);
-                summaryLines.forEach(line => {
-                    monthlyReport += `  ${line}\n`;
-                });
-                monthlyReport += `\n`;
+                reportText += `Day ${index + 1}: ${formattedDate}\n`;
+                reportText += `Report Preview: ${report.report.substring(0, 100)}...\n`;
+                reportText += `---\n`;
             });
             
-            monthlyReport += `\n========================================\n`;
-            monthlyReport += `END OF MONTHLY REPORT\n`;
-            monthlyReport += `Generated: ${new Date().toLocaleString()}\n`;
-            monthlyReport += `========================================\n`;
+            currentReportText = reportText;
+            appData.currentReportType = 'monthly';
             
-            // Display monthly report
-            document.getElementById('monthlyReportOutput').textContent = monthlyReport;
+            document.getElementById('monthlyReportOutput').textContent = reportText;
             document.getElementById('monthlyReportCard').style.display = 'block';
             
-            // Generate statistics display
-            generateMonthlyStats(monthlyReports, month, year, {
-                totalManpowerDays,
-                maxManpower,
-                minManpower,
-                rainyDays,
-                sunnyDays,
-                cloudyDays,
-                avgManpower,
-                totalMaterials: Array.from(totalMaterials),
-                totalMachinery: Array.from(totalMachinery)
-            });
-            
             showToast(`Monthly report generated for ${monthNames[month - 1]} ${year}`);
-        }
-        
-        function generateMonthlyStats(reports, month, year, stats) {
-            const statsDiv = document.getElementById('monthlyStats');
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            
-            statsDiv.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
-                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">📅 Month</div>
-                        <div style="font-size: 1.2rem; color: #3498db;">${monthNames[month - 1]} ${year}</div>
-                    </div>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
-                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">📊 Working Days</div>
-                        <div style="font-size: 1.2rem; color: #27ae60;">${reports.length}</div>
-                    </div>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
-                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">🌧️ Rainy Days</div>
-                        <div style="font-size: 1.2rem; color: #3498db;">${stats.rainyDays}</div>
-                    </div>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
-                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">👷 Avg Manpower</div>
-                        <div style="font-size: 1.2rem; color: #e74c3c;">${stats.avgManpower}</div>
-                    </div>
-                </div>
-                
-                <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb; margin-bottom: 15px;">
-                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">📈 Manpower Statistics</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
-                            Total Manpower Days: <strong>${stats.totalManpowerDays}</strong>
-                        </div>
-                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
-                            Max Daily: <strong>${stats.maxManpower}</strong>
-                        </div>
-                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
-                            Min Daily: <strong>${stats.minManpower}</strong>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('monthlyStatsCard').style.display = 'block';
         }
         
         function exportMonthlyToPDF() {
             try {
                 const month = parseInt(document.getElementById('monthSelect').value);
                 const year = parseInt(document.getElementById('yearSelect').value);
-                const monthNames = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
-                ];
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
                 
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                let yPos = 15;
+                
+                // Header
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MONTHLY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 6;
+                
+                doc.setFontSize(11);
+                doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 4;
+                
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 10;
+                
+                // Period
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Period: ${monthNames[month - 1]} ${year}`, margin, yPos);
+                yPos += 8;
+                
+                // Get saved reports
                 const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
                 const monthlyReports = savedReports.filter(report => {
                     const reportDate = new Date(report.date);
@@ -3127,267 +2833,94 @@
                 });
                 
                 if (monthlyReports.length === 0) {
-                    showToast('No reports found for selected month', 'error');
-                    return;
+                    doc.setFontSize(10);
+                    doc.text('No reports found for this month', margin, yPos);
+                    yPos += 10;
+                } else {
+                    // Summary Table
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('SUMMARY', margin, yPos);
+                    yPos += 6;
+                    
+                    const summaryData = [
+                        ['Total Working Days', monthlyReports.length.toString()],
+                        ['Month', monthNames[month - 1]],
+                        ['Year', year.toString()],
+                        ['Report Generated', new Date().toLocaleDateString()]
+                    ];
+                    
+                    doc.autoTable({
+                        startY: yPos,
+                        head: [['Item', 'Value']],
+                        body: summaryData,
+                        margin: { left: margin, right: margin },
+                        styles: { 
+                            fontSize: 9,
+                            cellPadding: 3,
+                            lineWidth: 0.1
+                        },
+                        headStyles: { 
+                            fillColor: [155, 89, 182], 
+                            textColor: [255, 255, 255], 
+                            fontStyle: 'bold',
+                            fontSize: 9
+                        },
+                        alternateRowStyles: { fillColor: [245, 245, 245] },
+                        tableWidth: 'wrap'
+                    });
+                    
+                    yPos = doc.lastAutoTable.finalY + 10;
+                    
+                    // Daily Reports List
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('DAILY REPORTS', margin, yPos);
+                    yPos += 6;
+                    
+                    const dailyReportsData = monthlyReports.map((report, index) => {
+                        const reportDate = new Date(report.date);
+                        return [
+                            (index + 1).toString(),
+                            formatDate(reportDate),
+                            report.report.substring(0, 30) + '...'
+                        ];
+                    });
+                    
+                    doc.autoTable({
+                        startY: yPos,
+                        head: [['No.', 'Date', 'Preview']],
+                        body: dailyReportsData,
+                        margin: { left: margin, right: margin },
+                        styles: { 
+                            fontSize: 8,
+                            cellPadding: 3,
+                            lineWidth: 0.1
+                        },
+                        headStyles: { 
+                            fillColor: [46, 134, 222], 
+                            textColor: [255, 255, 255], 
+                            fontStyle: 'bold',
+                            fontSize: 8
+                        },
+                        alternateRowStyles: { fillColor: [245, 245, 245] },
+                        tableWidth: 'wrap',
+                        columnStyles: {
+                            0: { cellWidth: 15 },
+                            1: { cellWidth: 30 },
+                            2: { cellWidth: 'auto' }
+                        }
+                    });
                 }
                 
-                // Calculate statistics
-                let totalManpowerDays = 0;
-                let maxManpower = 0;
-                let minManpower = Infinity;
-                let rainyDays = 0;
-                let sunnyDays = 0;
-                let cloudyDays = 0;
-                let totalMaterials = new Set();
-                let totalMachinery = new Set();
-                
-                monthlyReports.forEach(report => {
-                    const lines = report.report.split('\n');
-                    let dailyManpower = 0;
-                    let hasRain = false;
-                    
-                    lines.forEach(line => {
-                        if (line.includes(':') && !line.includes('Time') && !line.includes('Total')) {
-                            const match = line.match(/: (\d+)$/);
-                            if (match) dailyManpower += parseInt(match[1]);
-                        }
-                        if (line.includes('Rain') || line.includes('rain')) hasRain = true;
-                        if (line.includes('.') && (line.includes('Cement') || line.includes('Brick') || line.includes('Steel'))) {
-                            totalMaterials.add(line.substring(line.indexOf('.') + 2));
-                        }
-                        if (line.includes('.') && (line.includes('Excavator') || line.includes('Crane') || line.includes('Loader'))) {
-                            totalMachinery.add(line.substring(line.indexOf('.') + 2));
-                        }
-                    });
-                    
-                    totalManpowerDays += dailyManpower;
-                    maxManpower = Math.max(maxManpower, dailyManpower);
-                    minManpower = Math.min(minManpower, dailyManpower);
-                    if (hasRain) rainyDays++;
-                    if (lines.some(l => l.includes('Sunny'))) sunnyDays++;
-                    if (lines.some(l => l.includes('Cloudy'))) cloudyDays++;
-                });
-                
-                const avgManpower = Math.round(totalManpowerDays / monthlyReports.length);
-                
-                // Create PDF
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-                
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const margin = 10;
-                let yPos = 8;
-                
-                // Header
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text('MONTHLY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
-                yPos += 5;
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
-                doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
-                yPos += 4;
-                
-                doc.setFontSize(8);
-                doc.setFont('helvetica', 'normal');
-                doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
-                yPos += 8;
-                
-                // Period
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`Period: ${monthNames[month - 1]} ${year}`, margin, yPos);
-                doc.text(`Total Working Days: ${monthlyReports.length}`, pageWidth - margin, yPos, { align: 'right' });
-                yPos += 8;
-                
-                // Summary Statistics Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('MONTHLY SUMMARY STATISTICS', margin, yPos);
-                yPos += 5;
-                
-                const summaryData = [
-                    ['Rainy Days', rainyDays.toString()],
-                    ['Sunny Days', sunnyDays.toString()],
-                    ['Cloudy Days', cloudyDays.toString()],
-                    ['Average Daily Manpower', avgManpower.toString()],
-                    ['Maximum Manpower', maxManpower.toString()],
-                    ['Minimum Manpower', minManpower.toString()],
-                    ['Total Manpower Days', totalManpowerDays.toString()]
-                ];
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Item', 'Quantity']],
-                    body: summaryData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [155, 89, 182], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] }
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Materials Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('MATERIALS USED THIS MONTH', margin, yPos);
-                yPos += 5;
-                
-                const materialData = Array.from(totalMaterials).map(m => [m]);
-                if (materialData.length === 0) materialData.push(['No materials recorded']);
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Material Description']],
-                    body: materialData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] }
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Machinery Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('MACHINERY USED THIS MONTH', margin, yPos);
-                yPos += 5;
-                
-                const machineryData = Array.from(totalMachinery).map(m => [m]);
-                if (machineryData.length === 0) machineryData.push(['No machinery recorded']);
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['Machinery / Equipment']],
-                    body: machineryData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 7,
-                        cellPadding: 2,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [52, 152, 219], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 7
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] }
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 5;
-                
-                // Daily Reports Summary Table
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text('DAILY REPORTS SUMMARY', margin, yPos);
-                yPos += 5;
-                
-                const dailySummaryData = monthlyReports.map((report, index) => {
-                    const reportDate = new Date(report.date);
-                    const lines = report.report.split('\n');
-                    let manpower = 0;
-                    let weather = '-';
-                    
-                    lines.forEach(line => {
-                        if (line.includes('Total Manpower:')) {
-                            const match = line.match(/Total Manpower: (\d+)/);
-                            if (match) manpower = parseInt(match[1]);
-                        }
-                        if ((line.includes('Sunny') || line.includes('Rain') || line.includes('Cloudy')) && line.includes(':')) {
-                            const parts = line.split(':');
-                            if (parts.length > 1) weather = parts[1].trim().substring(0, 15);
-                        }
-                    });
-                    
-                    return [
-                        (index + 1).toString(),
-                        formatDate(reportDate),
-                        manpower.toString(),
-                        weather
-                    ];
-                });
-                
-                doc.autoTable({
-                    startY: yPos,
-                    head: [['No', 'Date', 'Manpower', 'Weather']],
-                    body: dailySummaryData,
-                    margin: { left: margin, right: margin },
-                    styles: { 
-                        fontSize: 6,
-                        cellPadding: 1,
-                        lineWidth: 0.1
-                    },
-                    headStyles: { 
-                        fillColor: [46, 204, 113], 
-                        textColor: 255, 
-                        fontStyle: 'bold',
-                        fontSize: 6
-                    },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    columnStyles: {
-                        0: { cellWidth: 8 },
-                        1: { cellWidth: 25 },
-                        2: { cellWidth: 15 },
-                        3: { cellWidth: 30 }
-                    }
-                });
-                
-                yPos = doc.lastAutoTable.finalY + 10;
-                
-                // Signatory Section
-                const signatoryY = Math.min(yPos, 240);
-                
-                doc.setFontSize(8);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Prepared By:', margin, signatoryY);
-                doc.setFont('helvetica', 'normal');
-                doc.line(margin, signatoryY + 2, margin + 40, signatoryY + 2);
-                doc.setFontSize(7);
-                doc.text(appData.pdfSettings.preparedByName, margin, signatoryY + 6);
-                doc.text(appData.pdfSettings.preparedByDesignation, margin, signatoryY + 10);
-                
-                doc.setFontSize(8);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Approved By:', pageWidth - margin - 40, signatoryY);
-                doc.setFont('helvetica', 'normal');
-                doc.line(pageWidth - margin - 40, signatoryY + 2, pageWidth - margin, signatoryY + 2);
-                doc.setFontSize(7);
-                doc.text(appData.pdfSettings.witnessedByName, pageWidth - margin - 40, signatoryY + 6);
-                doc.text(appData.pdfSettings.witnessedByDesignation, pageWidth - margin - 40, signatoryY + 10);
-                
                 // Footer
-                doc.setFontSize(6);
+                doc.setFontSize(7);
                 doc.setFont('helvetica', 'italic');
-                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
                 
                 // Save PDF
-                doc.save(`Monthly_Report_${monthNames[month - 1]}_${year}.pdf`);
+                const safeMonthName = monthNames[month - 1].replace(/\s+/g, '_');
+                doc.save(`Monthly_Report_${safeMonthName}_${year}.pdf`);
                 
                 showToast('Monthly PDF exported successfully');
                 
@@ -3397,219 +2930,16 @@
             }
         }
         
-        // Save Daily Report
-        function saveDailyReport() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report || report.includes('Report will appear here')) {
-                showToast('Please generate a report first', 'error');
-                return;
-            }
-            
-            const date = appData.currentDate;
-            const reportId = Date.now();
-            const reportData = {
-                id: reportId,
-                date: date.getTime(),
-                formattedDate: formatDate(date),
-                report: report,
-                type: 'daily',
-                timestamp: new Date().getTime()
-            };
-            
-            let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            const existingIndex = savedReports.findIndex(r => 
-                new Date(r.date).toDateString() === date.toDateString()
-            );
-            
-            if (existingIndex !== -1) {
-                savedReports[existingIndex] = reportData;
-                showToast('Report updated successfully');
-            } else {
-                savedReports.push(reportData);
-                showToast('Report saved successfully');
-            }
-            
-            localStorage.setItem('savedReports', JSON.stringify(savedReports));
-            
-            // Auto-backup if enabled
-            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
-                setTimeout(() => backupToGitHub(), 1000);
-            }
-            
-            if (document.getElementById('savedTab').classList.contains('active')) {
-                loadSavedReports();
-            }
-        }
-        
-        // Load Saved Reports
-        function loadSavedReports() {
-            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            const grid = document.getElementById('savedReportsGrid');
-            const noReportsMsg = document.getElementById('noReportsMessage');
-            
-            if (savedReports.length === 0) {
-                grid.innerHTML = '';
-                noReportsMsg.style.display = 'block';
-                return;
-            }
-            
-            noReportsMsg.style.display = 'none';
-            savedReports.sort((a, b) => b.date - a.date);
-            
-            grid.innerHTML = savedReports.map(report => `
-                <div class="saved-report-card">
-                    <div class="saved-report-date">
-                        ${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}
-                    </div>
-                    <div class="saved-report-preview">
-                        ${report.report.substring(0, 200)}...
-                    </div>
-                    <div class="saved-report-actions">
-                        <button class="saved-report-btn view" onclick="viewSavedReport(${report.id})">
-                            👁️ View
-                        </button>
-                        <button class="saved-report-btn pdf" onclick="exportSavedToPDF(${report.id})">
-                            📄 PDF
-                        </button>
-                        <button class="saved-report-btn delete" onclick="deleteSavedReport(${report.id})">
-                            🗑️ Delete
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function viewSavedReports() {
-            switchTab('saved');
-        }
-        
-        function showSavedReports() {
-            switchTab('saved');
-        }
-        
-        function viewSavedReport(reportId) {
-            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            const report = savedReports.find(r => r.id === reportId);
-            
-            if (report) {
-                document.getElementById('viewReportTitle').textContent = 
-                    `Report - ${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}`;
-                document.getElementById('viewReportContent').textContent = report.report;
-                openModal('viewReportModal');
-            }
-        }
-        
-        function deleteSavedReport(reportId) {
-            if (confirm('Are you sure you want to delete this report?')) {
-                let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-                savedReports = savedReports.filter(r => r.id !== reportId);
-                localStorage.setItem('savedReports', JSON.stringify(savedReports));
-                loadSavedReports();
-                showToast('Report deleted successfully');
-            }
-        }
-        
-        function deleteAllReports() {
-            if (confirm('Are you sure you want to delete ALL saved reports? This cannot be undone!')) {
-                localStorage.removeItem('savedReports');
-                loadSavedReports();
-                showToast('All reports deleted');
-            }
-        }
-        
-        function saveMonthlyReport() {
-            const report = document.getElementById('monthlyReportOutput').textContent;
-            if (!report || report.includes('Monthly report will appear here')) {
-                showToast('Please generate a monthly report first', 'error');
-                return;
-            }
-            
-            const month = parseInt(document.getElementById('monthSelect').value);
-            const year = parseInt(document.getElementById('yearSelect').value);
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            
-            const reportId = Date.now();
-            const reportData = {
-                id: reportId,
-                date: new Date(year, month - 1, 1).getTime(),
-                formattedDate: `${monthNames[month - 1]} ${year}`,
-                report: report,
-                type: 'monthly',
-                timestamp: new Date().getTime()
-            };
-            
-            let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            savedReports.push(reportData);
-            
-            localStorage.setItem('savedReports', JSON.stringify(savedReports));
-            
-            // Auto-backup if enabled
-            if (appData.githubConfig.autoBackup && appData.githubConfig.token) {
-                setTimeout(() => backupToGitHub(), 1000);
-            }
-            
-            showToast('Monthly report saved successfully');
-            
-            if (document.getElementById('savedTab').classList.contains('active')) {
-                loadSavedReports();
-            }
-        }
-        
-        // Export Saved Report to PDF
-        function exportSavedToPDF(reportId) {
-            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-            const report = savedReports.find(r => r.id === reportId);
-            
-            if (!report) {
-                showToast('Report not found', 'error');
-                return;
-            }
-            
-            const blob = new Blob([report.report], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Report_${report.formattedDate.replace(/\//g, '-')}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Report exported as text file');
-        }
-        
-        // Save Report as Text
-        function saveReport() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report || report.includes('Report will appear here')) {
-                showToast('Please generate a report first', 'error');
-                return;
-            }
-            
-            const date = formatDateForFile(appData.currentDate);
-            const filename = `Construction_Report_${date}.txt`;
-            
-            const blob = new Blob([report], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Report saved as: ' + filename);
-        }
-        
-        // Share Functions
+        // FIXED Share Functions
         function showShareOptions() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report || report.includes('Report will appear here')) {
+            // Get current report based on active tab
+            if (document.getElementById('dailyTab').classList.contains('active')) {
+                currentReportText = document.getElementById('reportOutput').textContent;
+            } else if (document.getElementById('monthlyTab').classList.contains('active')) {
+                currentReportText = document.getElementById('monthlyReportOutput').textContent;
+            }
+            
+            if (!currentReportText || currentReportText.includes('Report will appear here')) {
                 showToast('Please generate a report first', 'error');
                 return;
             }
@@ -3618,362 +2948,135 @@
         }
         
         function shareToWhatsApp() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report) return;
-            
-            try {
-                const cleanReport = report
-                    .replace(/\*/g, '')
-                    .replace(/\n{3,}/g, '\n\n')
-                    .trim();
-                
-                const encodedReport = encodeURIComponent(cleanReport);
-                const whatsappUrl = `https://wa.me/?text=${encodedReport}`;
-                
-                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-                showToast('Opening WhatsApp...');
-                closeModal();
-                
-            } catch (error) {
-                showToast('Error sharing to WhatsApp. Please copy manually.', 'error');
-                copyToClipboard();
+            if (!currentReportText) {
+                showToast('No report to share', 'error');
+                return;
             }
+            
+            const text = encodeURIComponent(currentReportText);
+            const whatsappUrl = `https://wa.me/?text=${text}`;
+            window.open(whatsappUrl, '_blank');
+            showToast('Opening WhatsApp...');
+            closeModal();
         }
         
         function shareToEmail() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report) return;
+            if (!currentReportText) {
+                showToast('No report to share', 'error');
+                return;
+            }
             
-            const date = formatDate(appData.currentDate);
-            const subject = `Construction Daily Report - ${date}`;
-            const body = encodeURIComponent(report);
-            
-            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
-            
-            const link = document.createElement('a');
-            link.href = mailtoLink;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
+            const subject = encodeURIComponent('Construction Daily Report');
+            const body = encodeURIComponent(currentReportText);
+            const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+            window.location.href = mailtoUrl;
             showToast('Opening email client...');
             closeModal();
         }
         
         function copyToClipboard() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report) return;
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = report;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            
-            textarea.select();
-            textarea.setSelectionRange(0, 99999);
-            
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('Report copied to clipboard!');
-                } else {
-                    throw new Error('Copy command failed');
-                }
-            } catch (err) {
-                navigator.clipboard.writeText(report).then(() => {
-                    showToast('Report copied to clipboard!');
-                }).catch(() => {
-                    showToast('Failed to copy. Please select and copy manually.', 'error');
-                });
+            if (!currentReportText) {
+                showToast('No report to copy', 'error');
+                return;
             }
             
-            document.body.removeChild(textarea);
-            closeModal();
+            navigator.clipboard.writeText(currentReportText)
+                .then(() => {
+                    showToast('Report copied to clipboard!');
+                    closeModal();
+                })
+                .catch(err => {
+                    showToast('Failed to copy: ' + err, 'error');
+                });
         }
         
         function printReport() {
-            const report = document.getElementById('reportOutput').textContent;
-            if (!report || report.includes('Report will appear here')) {
-                showToast('Please generate a report first', 'error');
+            if (!currentReportText) {
+                showToast('No report to print', 'error');
                 return;
             }
             
-            try {
-                const printWindow = window.open('', '_blank');
-                if (!printWindow) {
-                    showToast('Popup blocked. Please allow popups to print.', 'error');
-                    return;
-                }
-                
-                const date = appData.currentDate;
-                const formattedDate = formatDate(date);
-                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
-                
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Construction Report - ${formattedDate}</title>
-                        <style>
-                            @media print {
-                                @page { 
-                                    size: A4; 
-                                    margin: 10mm; 
-                                }
-                                body { 
-                                    font-family: Arial, sans-serif; 
-                                    font-size: 10pt; 
-                                    line-height: 1.3;
-                                }
-                            }
-                            body { 
-                                margin: 0; 
-                                padding: 15px; 
-                                max-width: 210mm;
-                                font-family: Arial, sans-serif;
-                                font-size: 10pt;
-                                line-height: 1.3;
-                            }
-                            .header { 
-                                text-align: center; 
-                                margin-bottom: 15px; 
-                                border-bottom: 2px solid #000; 
-                                padding-bottom: 10px;
-                            }
-                            .report-content { 
-                                white-space: pre-wrap; 
-                                font-family: 'Courier New', monospace; 
-                                font-size: 8pt;
-                            }
-                            .footer { 
-                                margin-top: 20px; 
-                                padding-top: 10px; 
-                                border-top: 1px solid #ccc; 
-                                font-size: 7pt; 
-                                text-align: center; 
-                                color: #666;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h1 style="margin: 0; font-size: 14pt;">GERAI BERSEPADU BELURU</h1>
-                            <h2 style="margin: 5px 0; font-size: 10pt;">Construction Daily Report</h2>
-                            <p style="margin: 0;"><strong>Date:</strong> ${formattedDate} | <strong>Day:</strong> ${dayOfWeek}</p>
-                        </div>
-                        <div class="report-content">${report}</div>
-                        <div class="footer">
-                            <p>Generated using Construction Daily Report System</p>
-                            <p>Printed on: ${new Date().toLocaleString()}</p>
-                        </div>
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                setTimeout(function() {
-                                    window.close();
-                                }, 500);
-                            }
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                
-                closeModal();
-                showToast('Opening print dialog...');
-                
-            } catch (error) {
-                showToast('Error opening print dialog.', 'error');
-            }
-        }
-        
-        // Clear Data
-        function showClearModal() {
-            openModal('clearModal');
-        }
-        
-        function clearAllData() {
-            if (!confirm('This will clear all form data but keep saved reports. Continue?')) {
-                closeModal();
-                return;
-            }
-            
-            appData.currentDate = new Date();
-            updateDateDisplay();
-            
-            appData.weatherPeriods = 1;
-            const weatherContainer = document.getElementById('weatherContainer');
-            weatherContainer.innerHTML = `
-                <div class="weather-card">
-                    <div class="weather-row">
-                        <div class="time-input-group">
-                            <input type="time" class="time-input" value="08:00" id="weatherStart1">
-                            <span class="time-separator">to</span>
-                            <input type="time" class="time-input" value="17:00" id="weatherEnd1">
-                        </div>
-                        
-                        <select class="condition-select" id="weatherCondition1">
-                            <option value="Sunny">☀️ Sunny</option>
-                            <option value="Partly Cloudy">⛅ Partly Cloudy</option>
-                            <option value="Cloudy">☁️ Cloudy</option>
-                            <option value="Rainy">🌧️ Rainy</option>
-                            <option value="Heavy Rain">⛈️ Heavy Rain</option>
-                            <option value="Thunderstorm">⚡ Thunderstorm</option>
-                            <option value="Foggy">🌫️ Foggy</option>
-                            <option value="Windy">💨 Windy</option>
-                            <option value="Clear Night">🌙 Clear Night</option>
-                        </select>
-                        
-                        <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes1">
-                    </div>
-                </div>
-            `;
-            
-            appData.manpower.forEach(person => {
-                if (person.id === 'sg') {
-                    person.value = 1;
-                } else {
-                    person.value = 0;
-                }
-            });
-            initManpowerGrid();
-            
-            resetList('materialList', 'NIL');
-            resetList('machineryList', 'Excavator - 1');
-            resetList('activityList', 'No Activity');
-            resetList('worksList', 'N/A');
-            resetList('remarksList', 'N/A');
-            
-            document.getElementById('reportCard').style.display = 'none';
-            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Construction Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        pre { white-space: pre-wrap; font-size: 12px; }
+                        @media print {
+                            body { margin: 0; padding: 10px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>Construction Daily Report</h2>
+                    <pre>${currentReportText}</pre>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function() {
+                                window.close();
+                            }, 1000);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            showToast('Opening print dialog...');
             closeModal();
-            showToast('All form data cleared');
         }
         
-        function resetList(containerId, defaultValue) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = `
-                <div class="list-item">
-                    <input type="text" class="list-input" value="${defaultValue}">
-                    <button class="remove-btn" onclick="removeListItem(this)">×</button>
-                </div>
-            `;
-        }
-        
-        // Storage Functions
-        function saveToStorage() {
-            try {
-                const data = {
-                    date: appData.currentDate.getTime(),
-                    weatherPeriods: appData.weatherPeriods,
-                    manpower: appData.manpower,
-                    materials: getListValues('materialList'),
-                    machinery: getListValues('machineryList'),
-                    activities: getListValues('activityList'),
-                    works: getListValues('worksList'),
-                    remarks: getListValues('remarksList'),
-                    savedAt: new Date().getTime()
-                };
+        // Helper Functions
+        function getWeatherData() {
+            const weatherData = [];
+            for (let i = 1; i <= appData.weatherPeriods; i++) {
+                const startEl = document.getElementById(`weatherStart${i}`);
+                const endEl = document.getElementById(`weatherEnd${i}`);
+                const conditionEl = document.getElementById(`weatherCondition${i}`);
+                const notesEl = document.getElementById(`weatherNotes${i}`);
                 
-                data.weather = {};
-                for (let i = 1; i <= appData.weatherPeriods; i++) {
-                    const start = document.getElementById(`weatherStart${i}`)?.value;
-                    const end = document.getElementById(`weatherEnd${i}`)?.value;
-                    const condition = document.getElementById(`weatherCondition${i}`)?.value;
-                    const notes = document.getElementById(`weatherNotes${i}`)?.value;
+                if (startEl && endEl && conditionEl) {
+                    const startTime = startEl.value;
+                    const endTime = endEl.value;
+                    const condition = conditionEl.value;
+                    const notes = notesEl ? notesEl.value : '';
                     
-                    if (start && end) {
-                        data.weather[i] = { start, end, condition, notes };
+                    if (startTime && endTime && condition) {
+                        weatherData.push({
+                            start: startTime,
+                            end: endTime,
+                            condition: condition,
+                            notes: notes
+                        });
                     }
                 }
-                
-                localStorage.setItem('constructionReportData', JSON.stringify(data));
-            } catch (e) {
-                console.error('Error saving data:', e);
             }
+            return weatherData;
         }
         
-        function loadFromStorage() {
-            try {
-                const saved = localStorage.getItem('constructionReportData');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    
-                    const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-                    if (data.savedAt && data.savedAt > weekAgo) {
-                        if (data.date) {
-                            appData.currentDate = new Date(data.date);
-                            updateDateDisplay();
-                        }
-                        
-                        if (data.weatherPeriods) {
-                            appData.weatherPeriods = data.weatherPeriods;
-                            const weatherContainer = document.getElementById('weatherContainer');
-                            weatherContainer.innerHTML = '';
-                            
-                            for (let i = 1; i <= appData.weatherPeriods; i++) {
-                                const weatherData = data.weather?.[i] || {};
-                                const card = document.createElement('div');
-                                card.className = 'weather-card';
-                                card.innerHTML = `
-                                    <div class="weather-row">
-                                        <div class="time-input-group">
-                                            <input type="time" class="time-input" value="${weatherData.start || '08:00'}" id="weatherStart${i}">
-                                            <span class="time-separator">to</span>
-                                            <input type="time" class="time-input" value="${weatherData.end || '17:00'}" id="weatherEnd${i}">
-                                        </div>
-                                        
-                                        <select class="condition-select" id="weatherCondition${i}">
-                                            <option value="Sunny" ${weatherData.condition === 'Sunny' ? 'selected' : ''}>☀️ Sunny</option>
-                                            <option value="Partly Cloudy" ${weatherData.condition === 'Partly Cloudy' ? 'selected' : ''}>⛅ Partly Cloudy</option>
-                                            <option value="Cloudy" ${weatherData.condition === 'Cloudy' ? 'selected' : ''}>☁️ Cloudy</option>
-                                            <option value="Rainy" ${weatherData.condition === 'Rainy' ? 'selected' : ''}>🌧️ Rainy</option>
-                                            <option value="Heavy Rain" ${weatherData.condition === 'Heavy Rain' ? 'selected' : ''}>⛈️ Heavy Rain</option>
-                                            <option value="Thunderstorm" ${weatherData.condition === 'Thunderstorm' ? 'selected' : ''}>⚡ Thunderstorm</option>
-                                            <option value="Foggy" ${weatherData.condition === 'Foggy' ? 'selected' : ''}>🌫️ Foggy</option>
-                                            <option value="Windy" ${weatherData.condition === 'Windy' ? 'selected' : ''}>💨 Windy</option>
-                                            <option value="Clear Night" ${weatherData.condition === 'Clear Night' ? 'selected' : ''}>🌙 Clear Night</option>
-                                        </select>
-                                        
-                                        <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes${i}" value="${weatherData.notes || ''}">
-                                    </div>
-                                `;
-                                weatherContainer.appendChild(card);
-                            }
-                        }
-                        
-                        if (data.manpower) {
-                            appData.manpower = data.manpower;
-                            initManpowerGrid();
-                        }
-                        
-                        loadList('materialList', data.materials || ['NIL']);
-                        loadList('machineryList', data.machinery || ['Excavator - 1']);
-                        loadList('activityList', data.activities || ['No Activity']);
-                        loadList('worksList', data.works || ['N/A']);
-                        loadList('remarksList', data.remarks || ['N/A']);
-                    }
-                }
-            } catch (e) {
-                console.error('Error loading data:', e);
-            }
+        function getListValues(containerId) {
+            const inputs = document.querySelectorAll(`#${containerId} .list-input`);
+            return Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(value => value);
         }
         
-        function loadList(containerId, items) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `
-                    <input type="text" class="list-input" value="${item}">
-                    <button class="remove-btn" onclick="removeListItem(this)">×</button>
-                `;
-                container.appendChild(div);
-            });
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function formatDateForFile(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
         
         // Modal Functions
@@ -3987,46 +3090,166 @@
             });
         }
         
+        function showPdfSettings(type) {
+            currentPdfType = type;
+            openModal('pdfSettingsModal');
+        }
+        
+        function generatePDFBasedOnType() {
+            if (currentPdfType === 'daily') {
+                exportToPDF();
+            } else if (currentPdfType === 'monthly') {
+                exportMonthlyToPDF();
+            }
+            closeModal();
+        }
+        
         // Toast Notification
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.style.background = type === 'error' ? '#e74c3c' : '#27ae60';
-            toast.classList.add('show');
+            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
             
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
         
-        // Event Listeners
+        // Setup Event Listeners
         function setupEventListeners() {
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('time-input') || 
-                    e.target.classList.contains('condition-select') ||
-                    e.target.classList.contains('form-input') ||
-                    e.target.classList.contains('list-input')) {
-                    saveToStorage();
-                }
+            // Save PDF settings when inputs change
+            document.getElementById('preparedByName').addEventListener('input', function() {
+                appData.pdfSettings.preparedByName = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
             });
             
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal();
+            document.getElementById('preparedByDesignation').addEventListener('input', function() {
+                appData.pdfSettings.preparedByDesignation = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            
+            document.getElementById('witnessedByName').addEventListener('input', function() {
+                appData.pdfSettings.witnessedByName = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            
+            document.getElementById('witnessedByDesignation').addEventListener('input', function() {
+                appData.pdfSettings.witnessedByDesignation = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            
+            document.getElementById('companyStamp').addEventListener('input', function() {
+                appData.pdfSettings.companyStamp = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+        }
+        
+        // Load PDF Settings
+        function loadPdfSettings() {
+            const saved = localStorage.getItem('pdfSettings');
+            if (saved) {
+                const savedSettings = JSON.parse(saved);
+                appData.pdfSettings = {
+                    ...appData.pdfSettings,
+                    ...savedSettings
+                };
+                
+                // Update UI
+                document.getElementById('preparedByName').value = appData.pdfSettings.preparedByName;
+                document.getElementById('preparedByDesignation').value = appData.pdfSettings.preparedByDesignation;
+                document.getElementById('witnessedByName').value = appData.pdfSettings.witnessedByName;
+                document.getElementById('witnessedByDesignation').value = appData.pdfSettings.witnessedByDesignation;
+                document.getElementById('companyStamp').value = appData.pdfSettings.companyStamp;
+            }
+        }
+        
+        // Storage Functions
+        function saveToStorage() {
+            const data = {
+                date: appData.currentDate.toISOString(),
+                weatherPeriods: appData.weatherPeriods,
+                manpower: appData.manpower,
+                progress: appData.progress,
+                materials: getListValues('materialList'),
+                machinery: getListValues('machineryList'),
+                activities: getListValues('activityList'),
+                works: getListValues('worksList'),
+                remarks: getListValues('remarksList')
+            };
+            
+            localStorage.setItem('currentReportData', JSON.stringify(data));
+        }
+        
+        function loadFromStorage() {
+            const saved = localStorage.getItem('currentReportData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                // Load date
+                appData.currentDate = new Date(data.date);
+                updateDateDisplay();
+                
+                // Load progress
+                if (data.progress) {
+                    appData.progress = data.progress;
+                    document.getElementById('physicalActual').value = data.progress.physical.actual;
+                    document.getElementById('physicalScheduled').value = data.progress.physical.scheduled;
+                    document.getElementById('financialActual').value = data.progress.financial.actual;
+                    document.getElementById('financialScheduled').value = data.progress.financial.scheduled;
+                    updatePhysicalProgress();
+                    updateFinancialProgress();
+                }
+                
+                // Load manpower
+                if (data.manpower) {
+                    appData.manpower = data.manpower;
+                    initManpowerGrid();
+                }
+                
+                // Load weather periods
+                if (data.weatherPeriods) {
+                    // Recreate weather periods
+                    const weatherContainer = document.getElementById('weatherContainer');
+                    weatherContainer.innerHTML = '';
+                    
+                    for (let i = 1; i <= data.weatherPeriods; i++) {
+                        const card = document.createElement('div');
+                        card.className = 'weather-card';
+                        card.innerHTML = `
+                            <div class="weather-row">
+                                <div class="time-input-group">
+                                    <input type="time" class="time-input" value="08:00" id="weatherStart${i}">
+                                    <span class="time-separator">to</span>
+                                    <input type="time" class="time-input" value="17:00" id="weatherEnd${i}">
+                                </div>
+                                <select class="condition-select" id="weatherCondition${i}">
+                                    <option value="Sunny">☀️ Sunny</option>
+                                    <option value="Partly Cloudy">⛅ Partly Cloudy</option>
+                                    <option value="Cloudy">☁️ Cloudy</option>
+                                    <option value="Rainy">🌧️ Rainy</option>
+                                    <option value="Heavy Rain">⛈️ Heavy Rain</option>
+                                    <option value="Thunderstorm">⚡ Thunderstorm</option>
+                                    <option value="Foggy">🌫️ Foggy</option>
+                                    <option value="Windy">💨 Windy</option>
+                                    <option value="Clear Night">🌙 Clear Night</option>
+                                </select>
+                                <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes${i}">
+                            </div>
+                        `;
+                        weatherContainer.appendChild(card);
                     }
-                });
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeModal();
+                    appData.weatherPeriods = data.weatherPeriods;
                 }
-            });
+            }
         }
         
         // Initialize App
         document.addEventListener('DOMContentLoaded', initApp);
+        
     </script>
 </body>
 </html>
