@@ -1,0 +1,3406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Construction Daily Report System - Gerai Bersepadu Beluru">
+    <title>📋 Construction Daily Report - Gerai Bersepadu Beluru</title>
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .login-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .login-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .login-error {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        /* Password Change Modal */
+        .password-change-container {
+            max-width: 400px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            font-size: 0.9rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .header-btn:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        /* Card Design */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* Section Titles */
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: "📌";
+            margin-right: 10px;
+        }
+        
+        /* Date Section */
+        .date-section {
+            background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .date-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .date-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .date-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .date-btn:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.98);
+        }
+        
+        /* Weather Section */
+        .weather-section {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .weather-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .weather-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .weather-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        @media (max-width: 768px) {
+            .weather-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .time-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .time-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .time-separator {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .condition-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .condition-select option {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .add-weather-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .add-weather-btn:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.98);
+        }
+        
+        /* Manpower Section */
+        .manpower-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .manpower-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        
+        .manpower-item:hover {
+            background: #e9ecef;
+        }
+        
+        .manpower-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+        
+        .manpower-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .counter-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #3498db;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .counter-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .counter-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .counter-btn.decrement {
+            background: #e74c3c;
+        }
+        
+        /* Dynamic Lists */
+        .list-container {
+            margin-top: 15px;
+        }
+        
+        .list-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .list-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #f8f9fa;
+        }
+        
+        .list-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+        
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .remove-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .add-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .add-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: #7f8c8d;
+            color: white;
+        }
+        
+        .action-btn.success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .action-btn.info {
+            background: #3498db;
+            color: white;
+        }
+        
+        .action-btn.warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        /* Report Section */
+        .report-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px dashed #ddd;
+            margin-top: 15px;
+        }
+        
+        /* Saved Reports Section */
+        .saved-reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .saved-report-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #e1e5eb;
+            transition: all 0.3s;
+        }
+        
+        .saved-report-card:hover {
+            border-color: #3498db;
+            background: white;
+        }
+        
+        .saved-report-date {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .saved-report-preview {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+        }
+        
+        .saved-report-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .saved-report-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .saved-report-btn.view {
+            background: #3498db;
+            color: white;
+        }
+        
+        .saved-report-btn.pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .saved-report-btn.delete {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        /* Monthly Report Section */
+        .monthly-report-section {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .monthly-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .monthly-input {
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .monthly-input option {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            bottom: 30px;
+        }
+        
+        .toast.error {
+            background: #e74c3c;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            opacity: 0.8;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .monthly-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .saved-reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .header h2 {
+                font-size: 0.8rem;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .manpower-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .weather-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .login-container {
+                padding: 20px;
+            }
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+        
+        /* Share Options Modal */
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .share-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .share-option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e1e5eb;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .share-option-btn:active {
+            transform: scale(0.95);
+            background: #e9ecef;
+        }
+        
+        .share-option-icon {
+            font-size: 2rem;
+        }
+        
+        .share-option-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border-color: #25D366;
+        }
+        
+        .email-btn {
+            background: #EA4335;
+            color: white;
+            border-color: #EA4335;
+        }
+        
+        .copy-btn {
+            background: #4285F4;
+            color: white;
+            border-color: #4285F4;
+        }
+        
+        .print-btn {
+            background: #FF9800;
+            color: white;
+            border-color: #FF9800;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5eb;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* PDF Settings Modal */
+        .pdf-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .setting-group {
+            margin-bottom: 15px;
+        }
+        
+        .setting-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <h1 class="login-title">🔒 Construction Report System</h1>
+            <p class="login-subtitle">Authorized Access Only</p>
+            
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off">
+            <div id="loginError" class="login-error">Incorrect password</div>
+            
+            <button id="loginBtn" class="login-btn">Login</button>
+            
+            <!-- No password hint displayed -->
+        </div>
+    </div>
+    
+    <!-- Main App (hidden initially) -->
+    <div id="mainApp" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>GERAI BERSEPADU BELURU</h1>
+                <h2>Construction Daily Report System</h2>
+            </div>
+            <div class="header-controls">
+                <button class="header-btn" onclick="showChangePassword()">🔐</button>
+                <button class="header-btn" onclick="showSavedReports()">📁</button>
+                <button class="header-btn" onclick="logout()">🚪</button>
+            </div>
+        </div>
+        
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('daily')">📅 Daily Report</button>
+                <button class="tab" onclick="switchTab('monthly')">📊 Monthly Report</button>
+                <button class="tab" onclick="switchTab('saved')">💾 Saved Reports</button>
+            </div>
+            
+            <!-- Daily Report Tab -->
+            <div id="dailyTab" class="tab-content active">
+                <!-- Date Section -->
+                <div class="date-section">
+                    <div class="date-display" id="currentDate">Loading...</div>
+                    <div class="date-controls">
+                        <button class="date-btn" onclick="showDatePicker()">📅 Pick Date</button>
+                        <button class="date-btn" onclick="useToday()">🔄 Today</button>
+                    </div>
+                </div>
+                
+                <!-- Weather Section -->
+                <div class="weather-section">
+                    <div class="weather-header">
+                        <div class="weather-title">🌤️ Weather Conditions by Time</div>
+                    </div>
+                    
+                    <div id="weatherContainer">
+                        <div class="weather-card">
+                            <div class="weather-row">
+                                <div class="time-input-group">
+                                    <input type="time" class="time-input" value="08:00" id="weatherStart1">
+                                    <span class="time-separator">to</span>
+                                    <input type="time" class="time-input" value="17:00" id="weatherEnd1">
+                                </div>
+                                
+                                <select class="condition-select" id="weatherCondition1">
+                                    <option value="Sunny">☀️ Sunny</option>
+                                    <option value="Partly Cloudy">⛅ Partly Cloudy</option>
+                                    <option value="Cloudy">☁️ Cloudy</option>
+                                    <option value="Rainy">🌧️ Rainy</option>
+                                    <option value="Heavy Rain">⛈️ Heavy Rain</option>
+                                    <option value="Thunderstorm">⚡ Thunderstorm</option>
+                                    <option value="Foggy">🌫️ Foggy</option>
+                                    <option value="Windy">💨 Windy</option>
+                                    <option value="Clear Night">🌙 Clear Night</option>
+                                </select>
+                                
+                                <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-weather-btn" onclick="addWeatherPeriod()">
+                        <span>+</span> Add Another Weather Period
+                    </button>
+                </div>
+                
+                <!-- Main Form Card -->
+                <div class="card">
+                    <!-- Manpower Section -->
+                    <div class="section-title">👷 Contractor Manpower</div>
+                    <div class="manpower-grid" id="manpowerGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Materials Section -->
+                    <div class="section-title" style="margin-top: 25px;">🧱 Construction Materials</div>
+                    <div class="list-container" id="materialList">
+                        <div class="list-item">
+                            <input type="text" class="list-input" value="NIL" placeholder="e.g., Cement - 50 bags">
+                            <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addListItem('materialList')">
+                        <span>+</span> Add Material
+                    </button>
+                    
+                    <!-- Machinery Section -->
+                    <div class="section-title" style="margin-top: 25px;">🚜 Machinery & Equipment</div>
+                    <div class="list-container" id="machineryList">
+                        <div class="list-item">
+                            <input type="text" class="list-input" value="Excavator - 1" placeholder="e.g., Excavator - 2 units">
+                            <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addListItem('machineryList')">
+                        <span>+</span> Add Machinery
+                    </button>
+                    
+                    <!-- Activities Section -->
+                    <div class="section-title" style="margin-top: 25px;">🏗️ Site Activities</div>
+                    <div class="list-container" id="activityList">
+                        <div class="list-item">
+                            <input type="text" class="list-input" value="No Activity" placeholder="e.g., Foundation work">
+                            <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addListItem('activityList')">
+                        <span>+</span> Add Activity
+                    </button>
+                    
+                    <!-- Works Done Section -->
+                    <div class="section-title" style="margin-top: 25px;">✅ Works Done</div>
+                    <div class="list-container" id="worksList">
+                        <div class="list-item">
+                            <input type="text" class="list-input" value="N/A" placeholder="e.g., Completed foundation pour">
+                            <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addListItem('worksList')">
+                        <span>+</span> Add Work Item
+                    </button>
+                    
+                    <!-- Remarks Section -->
+                    <div class="section-title" style="margin-top: 25px;">💬 Remarks</div>
+                    <div class="list-container" id="remarksList">
+                        <div class="list-item">
+                            <input type="text" class="list-input" value="N/A" placeholder="e.g., Site inspection passed">
+                            <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addListItem('remarksList')">
+                        <span>+</span> Add Remark
+                    </button>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn primary" onclick="generateReport()">
+                            📊 Generate Daily Report
+                        </button>
+                        <button class="action-btn secondary" onclick="showClearModal()">
+                            🗑️ Clear All Data
+                        </button>
+                        <button class="action-btn info" onclick="saveDailyReport()">
+                            💾 Save Report
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Report Display Card -->
+                <div class="card" id="reportCard" style="display: none;">
+                    <div class="section-title">📋 Daily Report</div>
+                    <div class="report-content" id="reportOutput">
+                        Report will appear here
+                    </div>
+                    
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button class="action-btn success" onclick="saveReport()">
+                            💾 Save as Text
+                        </button>
+                        <button class="action-btn warning" onclick="showPdfSettings('daily')">
+                            📄 Export to PDF
+                        </button>
+                        <button class="action-btn primary" onclick="showShareOptions()">
+                            📤 Share Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Monthly Report Tab -->
+            <div id="monthlyTab" class="tab-content">
+                <div class="monthly-report-section">
+                    <div class="weather-title">📊 Monthly Report Generator</div>
+                    <p style="margin-top: 10px; opacity: 0.9;">Generate a summary report for an entire month</p>
+                    
+                    <div class="monthly-controls">
+                        <select id="monthSelect" class="monthly-input">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        
+                        <select id="yearSelect" class="monthly-input">
+                            <!-- Will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <button class="add-weather-btn" onclick="generateMonthlyReport()">
+                        📊 Generate Monthly Report
+                    </button>
+                </div>
+                
+                <!-- Monthly Report Display -->
+                <div class="card" id="monthlyReportCard" style="display: none;">
+                    <div class="section-title">📅 Monthly Summary Report</div>
+                    <div class="report-content" id="monthlyReportOutput">
+                        Monthly report will appear here
+                    </div>
+                    
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button class="action-btn success" onclick="saveMonthlyReport()">
+                            💾 Save Monthly Report
+                        </button>
+                        <button class="action-btn warning" onclick="showPdfSettings('monthly')">
+                            📄 Export to PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Monthly Statistics -->
+                <div class="card" id="monthlyStatsCard" style="display: none;">
+                    <div class="section-title">📈 Monthly Statistics</div>
+                    <div id="monthlyStats" style="padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        Statistics will appear here
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Saved Reports Tab -->
+            <div id="savedTab" class="tab-content">
+                <div class="card">
+                    <div class="section-title">💾 Saved Reports</div>
+                    <p style="margin-bottom: 20px;">View, export, or delete previously saved reports</p>
+                    
+                    <div class="saved-reports-grid" id="savedReportsGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+                        <div id="noReportsMessage" style="display: block;">No saved reports yet</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2024 Construction Daily Report System</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">All data stored locally on your device</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">v4.0 • Secure Access • 1-Page PDF Reports</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="dateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">📅 Select Date</div>
+            <input type="date" id="datePicker" class="form-input" style="margin-bottom: 20px;">
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="setSelectedDate()">
+                    Set Date
+                </button>
+                <button class="action-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Clear All Data</div>
+            <p>Are you sure you want to clear all form data? This cannot be undone.</p>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="action-btn secondary" onclick="clearAllData()">
+                    Yes, Clear All
+                </button>
+                <button class="action-btn" onclick="closeModal()" style="background: #7f8c8d; color: white;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PDF Settings Modal -->
+    <div id="pdfSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">📄 PDF Export Settings</div>
+            
+            <div class="pdf-settings">
+                <div class="setting-group">
+                    <label class="setting-label">Prepared By:</label>
+                    <input type="text" id="preparedByName" class="form-input" placeholder="Enter name" value="Site Supervisor">
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Designation:</label>
+                    <input type="text" id="preparedByDesignation" class="form-input" placeholder="Enter designation" value="Site Supervisor">
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Witnessed By:</label>
+                    <input type="text" id="witnessedByName" class="form-input" placeholder="Enter name" value="Project Manager">
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Designation:</label>
+                    <input type="text" id="witnessedByDesignation" class="form-input" placeholder="Enter designation" value="Project Manager">
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <label class="setting-label">Company Stamp (Optional):</label>
+                <input type="text" id="companyStamp" class="form-input" placeholder="Enter company name for stamp">
+            </div>
+            
+            <div id="pdfSettingsError" style="color: #e74c3c; margin-top: 15px; display: none;"></div>
+            
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="action-btn primary" onclick="generatePDFBasedOnType()">
+                    Generate PDF
+                </button>
+                <button class="action-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content password-change-container">
+            <div class="modal-title">🔐 Change Password</div>
+            <input type="password" id="currentPassword" class="form-input" placeholder="Current password" style="margin-bottom: 15px;">
+            <input type="password" id="newPassword" class="form-input" placeholder="New password (min 6 characters)" style="margin-bottom: 15px;">
+            <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password" style="margin-bottom: 15px;">
+            <div id="passwordError" style="color: #e74c3c; margin-bottom: 15px; display: none;"></div>
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="changePassword()">
+                    Change Password
+                </button>
+                <button class="action-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Report Modal -->
+    <div id="viewReportModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-title" id="viewReportTitle">📋 Report</div>
+            <div class="report-content" id="viewReportContent" style="max-height: 60vh;">
+                Report content
+            </div>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="action-btn primary" onclick="closeModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Share Options Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">📤 Share Report</div>
+            <p style="margin-bottom: 20px;">Choose how you want to share the report:</p>
+            
+            <div class="share-options">
+                <button class="share-option-btn whatsapp-btn" onclick="shareToWhatsApp()">
+                    <span class="share-option-icon">💚</span>
+                    <span class="share-option-label">WhatsApp</span>
+                </button>
+                
+                <button class="share-option-btn email-btn" onclick="shareToEmail()">
+                    <span class="share-option-icon">📧</span>
+                    <span class="share-option-label">Email</span>
+                </button>
+                
+                <button class="share-option-btn copy-btn" onclick="copyToClipboard()">
+                    <span class="share-option-icon">📋</span>
+                    <span class="share-option-label">Copy Text</span>
+                </button>
+                
+                <button class="share-option-btn print-btn" onclick="printReport()">
+                    <span class="share-option-icon">🖨️</span>
+                    <span class="share-option-label">Print</span>
+                </button>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="action-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        // App Data
+        const appData = {
+            currentDate: new Date(),
+            weatherPeriods: 1,
+            manpower: [
+                { id: 'pm', name: 'Project Manager', value: 0 },
+                { id: 'pe', name: 'Project Engineer', value: 0 },
+                { id: 'se', name: 'Site Engineer', value: 0 },
+                { id: 'ss', name: 'Site Supervisor', value: 0 },
+                { id: 'sv', name: 'Surveyor', value: 0 },
+                { id: 'op', name: 'Operator', value: 0 },
+                { id: 'dr', name: 'Driver', value: 0 },
+                { id: 'bb', name: 'Bar Bender', value: 0 },
+                { id: 'cp', name: 'Carpenter', value: 0 },
+                { id: 'gw', name: 'General Worker', value: 0 },
+                { id: 'sg', name: 'Security Guard', value: 1 }
+            ],
+            savedReports: [],
+            isLoggedIn: false,
+            pdfSettings: {
+                preparedByName: 'Site Supervisor',
+                preparedByDesignation: 'Site Supervisor',
+                witnessedByName: 'Project Manager',
+                witnessedByDesignation: 'Project Manager',
+                companyStamp: ''
+            }
+        };
+        
+        // Password System
+        const PASSWORD_KEY = 'construction_report_password';
+        const DEFAULT_PASSWORD = 'admin123'; // Default password, will be changed on first use
+        
+        // PDF Type Tracking
+        let currentPdfType = '';
+        
+        // Initialize App
+        function initApp() {
+            setupLogin();
+            populateYearSelect();
+            loadPdfSettings();
+            
+            // Check if already logged in
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                loginSuccess();
+            }
+        }
+        
+        // Enhanced Password Functions
+        function setupLogin() {
+            // Initialize password if not exists with secure default
+            if (!localStorage.getItem(PASSWORD_KEY)) {
+                // Generate a more secure initial password
+                const secureDefault = DEFAULT_PASSWORD + Math.random().toString(36).substring(2, 8);
+                localStorage.setItem(PASSWORD_KEY, secureDefault);
+                
+                // Store that this is first login
+                localStorage.setItem('firstLogin', 'true');
+            }
+            
+            // Setup login button
+            document.getElementById('loginBtn').addEventListener('click', attemptLogin);
+            
+            // Allow Enter key for login
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') attemptLogin();
+            });
+            
+            // Focus on password input
+            setTimeout(() => {
+                document.getElementById('passwordInput').focus();
+            }, 100);
+        }
+        
+        function attemptLogin() {
+            const input = document.getElementById('passwordInput').value;
+            const storedPassword = localStorage.getItem(PASSWORD_KEY);
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!input) {
+                errorDiv.textContent = 'Please enter password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (input === storedPassword) {
+                loginSuccess();
+                errorDiv.style.display = 'none';
+            } else {
+                errorDiv.textContent = 'Incorrect password';
+                errorDiv.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+                
+                // Add shake animation
+                errorDiv.parentElement.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    errorDiv.parentElement.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function loginSuccess() {
+            appData.isLoggedIn = true;
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            // Hide login, show app
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Check if first login
+            const firstLogin = localStorage.getItem('firstLogin');
+            if (firstLogin === 'true') {
+                // Force password change on first login
+                setTimeout(() => {
+                    showChangePassword();
+                    showToast('Please change your default password for security');
+                }, 1000);
+                localStorage.removeItem('firstLogin');
+            }
+            
+            // Initialize app components
+            updateDateDisplay();
+            initManpowerGrid();
+            setupEventListeners();
+            loadFromStorage();
+            loadSavedReports();
+            
+            // Set default time values
+            document.getElementById('weatherStart1').value = "08:00";
+            document.getElementById('weatherEnd1').value = "17:00";
+            
+            showToast('Welcome to Construction Report System!');
+            
+            // Auto-hide login screen after animation
+            setTimeout(() => {
+                document.getElementById('loginScreen').style.display = 'none';
+            }, 300);
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                appData.isLoggedIn = false;
+                localStorage.removeItem('isLoggedIn');
+                
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+                document.getElementById('loginError').style.display = 'none';
+                
+                showToast('Logged out successfully');
+            }
+        }
+        
+        function showChangePassword() {
+            openModal('passwordModal');
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordError').style.display = 'none';
+        }
+        
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordError');
+            const storedPassword = localStorage.getItem(PASSWORD_KEY);
+            
+            // Validation
+            if (!current || !newPass || !confirm) {
+                errorDiv.textContent = 'All fields are required';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (current !== storedPassword) {
+                errorDiv.textContent = 'Current password is incorrect';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPass.length < 6) {
+                errorDiv.textContent = 'New password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPass === current) {
+                errorDiv.textContent = 'New password must be different from current password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                errorDiv.textContent = 'New passwords do not match';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Simple password strength check
+            const hasUpperCase = /[A-Z]/.test(newPass);
+            const hasLowerCase = /[a-z]/.test(newPass);
+            const hasNumbers = /\d/.test(newPass);
+            
+            if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+                errorDiv.textContent = 'Password must contain uppercase, lowercase letters and numbers';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Save new password
+            localStorage.setItem(PASSWORD_KEY, newPass);
+            showToast('Password changed successfully');
+            closeModal();
+        }
+        
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            if (tabName === 'saved') {
+                loadSavedReports();
+            }
+        }
+        
+        // Date Functions
+        function updateDateDisplay() {
+            const date = appData.currentDate;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = date.toLocaleDateString('en-US', options);
+        }
+        
+        function useToday() {
+            appData.currentDate = new Date();
+            updateDateDisplay();
+            showToast('Date set to today');
+            saveToStorage();
+        }
+        
+        function showDatePicker() {
+            openModal('dateModal');
+            const datePicker = document.getElementById('datePicker');
+            datePicker.valueAsDate = appData.currentDate;
+        }
+        
+        function setSelectedDate() {
+            const datePicker = document.getElementById('datePicker');
+            appData.currentDate = new Date(datePicker.value);
+            updateDateDisplay();
+            closeModal();
+            saveToStorage();
+            showToast('Date updated successfully');
+        }
+        
+        // Weather Functions
+        function addWeatherPeriod() {
+            appData.weatherPeriods++;
+            const container = document.getElementById('weatherContainer');
+            const newCard = document.createElement('div');
+            newCard.className = 'weather-card';
+            newCard.innerHTML = `
+                <div class="weather-row">
+                    <div class="time-input-group">
+                        <input type="time" class="time-input" value="08:00" id="weatherStart${appData.weatherPeriods}">
+                        <span class="time-separator">to</span>
+                        <input type="time" class="time-input" value="17:00" id="weatherEnd${appData.weatherPeriods}">
+                    </div>
+                    
+                    <select class="condition-select" id="weatherCondition${appData.weatherPeriods}">
+                        <option value="Sunny">☀️ Sunny</option>
+                        <option value="Partly Cloudy">⛅ Partly Cloudy</option>
+                        <option value="Cloudy">☁️ Cloudy</option>
+                        <option value="Rainy">🌧️ Rainy</option>
+                        <option value="Heavy Rain">⛈️ Heavy Rain</option>
+                        <option value="Thunderstorm">⚡ Thunderstorm</option>
+                        <option value="Foggy">🌫️ Foggy</option>
+                        <option value="Windy">💨 Windy</option>
+                        <option value="Clear Night">🌙 Clear Night</option>
+                    </select>
+                    
+                    <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes${appData.weatherPeriods}">
+                </div>
+            `;
+            container.appendChild(newCard);
+            saveToStorage();
+        }
+        
+        function getWeatherData() {
+            const weatherData = [];
+            for (let i = 1; i <= appData.weatherPeriods; i++) {
+                const startTime = document.getElementById(`weatherStart${i}`)?.value;
+                const endTime = document.getElementById(`weatherEnd${i}`)?.value;
+                const condition = document.getElementById(`weatherCondition${i}`)?.value;
+                const notes = document.getElementById(`weatherNotes${i}`)?.value;
+                
+                if (startTime && endTime && condition) {
+                    weatherData.push({
+                        start: startTime,
+                        end: endTime,
+                        condition: condition,
+                        notes: notes || ''
+                    });
+                }
+            }
+            return weatherData;
+        }
+        
+        // Manpower Functions
+        function initManpowerGrid() {
+            const grid = document.getElementById('manpowerGrid');
+            grid.innerHTML = '';
+            
+            appData.manpower.forEach(person => {
+                const item = document.createElement('div');
+                item.className = 'manpower-item';
+                item.innerHTML = `
+                    <div class="manpower-label">${person.name}</div>
+                    <div class="manpower-controls">
+                        <button class="counter-btn decrement" onclick="updateManpower('${person.id}', -1)">-</button>
+                        <div class="counter-value" id="${person.id}Value">${person.value}</div>
+                        <button class="counter-btn" onclick="updateManpower('${person.id}', 1)">+</button>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+        
+        function updateManpower(id, change) {
+            const person = appData.manpower.find(p => p.id === id);
+            if (person) {
+                const newValue = person.value + change;
+                if (newValue >= 0) {
+                    person.value = newValue;
+                    document.getElementById(`${id}Value`).textContent = newValue;
+                    saveToStorage();
+                }
+            }
+        }
+        
+        // Dynamic Lists
+        function addListItem(containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <input type="text" class="list-input" placeholder="Enter item...">
+                <button class="remove-btn" onclick="removeListItem(this)">×</button>
+            `;
+            container.appendChild(div);
+            div.querySelector('input').focus();
+            saveToStorage();
+        }
+        
+        function removeListItem(button) {
+            const container = button.parentElement.parentElement;
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+                saveToStorage();
+            }
+        }
+        
+        // Report Generation
+        function generateReport() {
+            try {
+                const date = appData.currentDate;
+                const formattedDate = formatDate(date);
+                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                const weatherData = getWeatherData();
+                const materials = getListValues('materialList');
+                const machinery = getListValues('machineryList');
+                const activities = getListValues('activityList');
+                const works = getListValues('worksList');
+                const remarks = getListValues('remarksList');
+                
+                let report = `Project Title: CADANGAN GERAI BERSEPADU BELURU DI ATAS LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI.\n\n`;
+                report += `DAILY CONSTRUCTION REPORT\n\n`;
+                report += `Date: ${formattedDate}\n`;
+                report += `Day: ${dayOfWeek}\n\n`;
+                report += `WEATHER CONDITIONS:\n`;
+                
+                if (weatherData.length > 0) {
+                    weatherData.forEach(weather => {
+                        report += `${weather.start} - ${weather.end}: ${weather.condition}`;
+                        if (weather.notes) report += ` (${weather.notes})`;
+                        report += '\n';
+                    });
+                } else {
+                    report += `No weather data recorded\n`;
+                }
+                
+                report += `\nMANPOWER ON SITE:\n`;
+                appData.manpower.forEach(person => {
+                    if (person.value > 0) {
+                        report += `${person.name}: ${person.value}\n`;
+                    }
+                });
+                
+                const totalManpower = appData.manpower.reduce((sum, person) => sum + person.value, 0);
+                report += `Total Manpower: ${totalManpower}\n`;
+                
+                report += `\nCONSTRUCTION MATERIALS ON SITE:\n`;
+                if (materials.length && materials[0] !== 'NIL') {
+                    materials.forEach((item, i) => {
+                        report += `${i + 1}. ${item}\n`;
+                    });
+                } else {
+                    report += `1. NIL\n`;
+                }
+                
+                report += `\nMACHINERY AND EQUIPMENT:\n`;
+                if (machinery.length) {
+                    machinery.forEach((item, i) => {
+                        report += `${i + 1}. ${item}\n`;
+                    });
+                } else {
+                    report += `1. NIL\n`;
+                }
+                
+                report += `\nSITE ACTIVITIES:\n`;
+                if (activities.length && activities[0] !== 'No Activity') {
+                    activities.forEach((item, i) => {
+                        report += `${i + 1}. ${item}\n`;
+                    });
+                } else {
+                    report += `1. No Activity\n`;
+                }
+                
+                report += `\nWORKS COMPLETED:\n`;
+                if (works.length && works[0] !== 'N/A') {
+                    works.forEach((item, i) => {
+                        report += `${i + 1}. ${item}\n`;
+                    });
+                } else {
+                    report += `1. N/A\n`;
+                }
+                
+                report += `\nREMARKS:\n`;
+                if (remarks.length && remarks[0] !== 'N/A') {
+                    remarks.forEach((item, i) => {
+                        report += `${i + 1}. ${item}\n`;
+                    });
+                } else {
+                    report += `1. N/A\n`;
+                }
+                
+                report += `\n\n--- END OF REPORT ---\n`;
+                report += `Generated: ${new Date().toLocaleString()}`;
+                
+                document.getElementById('reportOutput').textContent = report;
+                document.getElementById('reportCard').style.display = 'block';
+                document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' });
+                saveToStorage();
+                showToast('Daily report generated successfully!');
+                
+            } catch (error) {
+                showToast('Error generating report: ' + error.message, 'error');
+            }
+        }
+        
+        function getListValues(containerId) {
+            const inputs = document.querySelectorAll(`#${containerId} .list-input`);
+            return Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(value => value);
+        }
+        
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function formatDateForFile(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // PDF Settings Functions
+        function loadPdfSettings() {
+            const saved = localStorage.getItem('pdfSettings');
+            if (saved) {
+                appData.pdfSettings = JSON.parse(saved);
+            }
+            
+            // Update form inputs
+            document.getElementById('preparedByName').value = appData.pdfSettings.preparedByName;
+            document.getElementById('preparedByDesignation').value = appData.pdfSettings.preparedByDesignation;
+            document.getElementById('witnessedByName').value = appData.pdfSettings.witnessedByName;
+            document.getElementById('witnessedByDesignation').value = appData.pdfSettings.witnessedByDesignation;
+            document.getElementById('companyStamp').value = appData.pdfSettings.companyStamp;
+        }
+        
+        function savePdfSettings() {
+            appData.pdfSettings = {
+                preparedByName: document.getElementById('preparedByName').value,
+                preparedByDesignation: document.getElementById('preparedByDesignation').value,
+                witnessedByName: document.getElementById('witnessedByName').value,
+                witnessedByDesignation: document.getElementById('witnessedByDesignation').value,
+                companyStamp: document.getElementById('companyStamp').value
+            };
+            
+            localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            return true;
+        }
+        
+        function showPdfSettings(type) {
+            currentPdfType = type;
+            
+            if (type === 'daily') {
+                const report = document.getElementById('reportOutput').textContent;
+                if (!report || report.includes('Report will appear here')) {
+                    showToast('Please generate a report first', 'error');
+                    return;
+                }
+            } else if (type === 'monthly') {
+                const report = document.getElementById('monthlyReportOutput').textContent;
+                if (!report || report.includes('Monthly report will appear here')) {
+                    showToast('Please generate a monthly report first', 'error');
+                    return;
+                }
+            }
+            
+            openModal('pdfSettingsModal');
+        }
+        
+        function generatePDFBasedOnType() {
+            if (!savePdfSettings()) {
+                return;
+            }
+            
+            if (currentPdfType === 'daily') {
+                exportToPDF();
+            } else if (currentPdfType === 'monthly') {
+                exportMonthlyToPDF();
+            }
+            
+            closeModal();
+        }
+        
+        // Enhanced 1-Page A4 PDF Export with Optimized Layout
+        function exportToPDF() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 10; // Reduced margins
+                let yPos = 8; // Start higher up
+                
+                // Header with smaller font
+                doc.setFontSize(12); // Reduced from 16
+                doc.setFont('helvetica', 'bold');
+                doc.text('DAILY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 5;
+                
+                doc.setFontSize(10); // Reduced from 12
+                doc.setFont('helvetica', 'bold');
+                doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 4;
+                
+                doc.setFontSize(8); // Reduced from 10
+                doc.setFont('helvetica', 'normal');
+                doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 8;
+                
+                // Date section compact
+                const date = appData.currentDate;
+                const formattedDate = formatDate(date);
+                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Date: ${formattedDate}`, margin, yPos);
+                doc.text(`Day: ${dayOfWeek}`, pageWidth - margin, yPos, { align: 'right' });
+                yPos += 6;
+                
+                // Horizontal line
+                doc.setLineWidth(0.5);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 8;
+                
+                // Weather Table (Compact)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('1. WEATHER CONDITIONS', margin, yPos);
+                yPos += 5;
+                
+                const weatherData = getWeatherData();
+                if (weatherData.length > 0) {
+                    const weatherTableData = weatherData.map(w => [
+                        w.start + ' - ' + w.end,
+                        w.condition,
+                        w.notes || '-'
+                    ]);
+                    
+                    doc.autoTable({
+                        startY: yPos,
+                        head: [['Time Period', 'Condition', 'Remarks']],
+                        body: weatherTableData,
+                        margin: { left: margin, right: margin },
+                        styles: { 
+                            fontSize: 7, // Smaller font
+                            cellPadding: 2, // Reduced padding
+                            lineWidth: 0.1 // Thinner lines
+                        },
+                        headStyles: { 
+                            fillColor: [52, 152, 219], 
+                            textColor: 255, 
+                            fontStyle: 'bold',
+                            fontSize: 7 // Smaller header font
+                        },
+                        alternateRowStyles: { fillColor: [245, 245, 245] },
+                        tableWidth: 'wrap',
+                        columnStyles: {
+                            0: { cellWidth: 30 },
+                            1: { cellWidth: 30 },
+                            2: { cellWidth: pageWidth - 2*margin - 60 }
+                        }
+                    });
+                    
+                    yPos = doc.lastAutoTable.finalY + 5;
+                } else {
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('No weather data recorded', margin + 5, yPos);
+                    yPos += 8;
+                }
+                
+                // Manpower Table (Compact)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('2. MANPOWER ON SITE', margin, yPos);
+                yPos += 5;
+                
+                const manpowerData = appData.manpower
+                    .filter(p => p.value > 0)
+                    .map(p => [p.name, p.value.toString()]);
+                
+                const totalManpower = appData.manpower.reduce((sum, p) => sum + p.value, 0);
+                if (manpowerData.length > 0) {
+                    manpowerData.push(['TOTAL MANPOWER', totalManpower.toString()]);
+                    
+                    doc.autoTable({
+                        startY: yPos,
+                        head: [['Position', 'No. of Workers']],
+                        body: manpowerData,
+                        margin: { left: margin, right: margin },
+                        styles: { 
+                            fontSize: 7,
+                            cellPadding: 2,
+                            lineWidth: 0.1
+                        },
+                        headStyles: { 
+                            fillColor: [52, 152, 219], 
+                            textColor: 255, 
+                            fontStyle: 'bold',
+                            fontSize: 7
+                        },
+                        alternateRowStyles: { fillColor: [245, 245, 245] },
+                        tableWidth: 'wrap'
+                    });
+                    
+                    yPos = doc.lastAutoTable.finalY + 5;
+                } else {
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('No manpower recorded', margin + 5, yPos);
+                    yPos += 8;
+                }
+                
+                // Materials Table (Compact - limit rows)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('3. CONSTRUCTION MATERIALS ON SITE', margin, yPos);
+                yPos += 5;
+                
+                const materials = getListValues('materialList').filter(m => m !== 'NIL');
+                const materialData = materials.length > 0 ? 
+                    materials.slice(0, 4).map(m => [m]) : // Limit to 4 rows
+                    [['No materials on site']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Material Description']],
+                    body: materialData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Machinery Table (Compact - limit rows)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('4. MACHINERY AND EQUIPMENT', margin, yPos);
+                yPos += 5;
+                
+                const machinery = getListValues('machineryList');
+                const machineryData = machinery.length > 0 ? 
+                    machinery.slice(0, 4).map(m => [m]) : // Limit to 4 rows
+                    [['No machinery on site']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Machinery / Equipment']],
+                    body: machineryData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Activities Table (Compact - limit rows)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('5. SITE ACTIVITIES', margin, yPos);
+                yPos += 5;
+                
+                const activities = getListValues('activityList').filter(a => a !== 'No Activity');
+                const activityData = activities.length > 0 ? 
+                    activities.slice(0, 4).map(a => [a]) : // Limit to 4 rows
+                    [['No activities recorded']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Activity Description']],
+                    body: activityData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Works Done Table (Compact - limit rows)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('6. WORKS COMPLETED', margin, yPos);
+                yPos += 5;
+                
+                const works = getListValues('worksList').filter(w => w !== 'N/A');
+                const workData = works.length > 0 ? 
+                    works.slice(0, 4).map(w => [w]) : // Limit to 4 rows
+                    [['No works completed']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Completed Work']],
+                    body: workData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Remarks Table (Compact - limit rows)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('7. REMARKS', margin, yPos);
+                yPos += 5;
+                
+                const remarks = getListValues('remarksList').filter(r => r !== 'N/A');
+                const remarkData = remarks.length > 0 ? 
+                    remarks.slice(0, 3).map(r => [r]) : // Limit to 3 rows
+                    [['No remarks']];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Remarks / Observations']],
+                    body: remarkData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    tableWidth: 'wrap'
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // Compact Signatory Section
+                const signatoryY = Math.min(yPos, 240); // Ensure it fits on one page
+                
+                // Prepared By
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Prepared By:', margin, signatoryY);
+                doc.setFont('helvetica', 'normal');
+                doc.line(margin, signatoryY + 2, margin + 40, signatoryY + 2);
+                doc.setFontSize(7);
+                doc.text(appData.pdfSettings.preparedByName, margin, signatoryY + 6);
+                doc.text(appData.pdfSettings.preparedByDesignation, margin, signatoryY + 10);
+                
+                // Witnessed By
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Witnessed By:', pageWidth - margin - 40, signatoryY);
+                doc.setFont('helvetica', 'normal');
+                doc.line(pageWidth - margin - 40, signatoryY + 2, pageWidth - margin, signatoryY + 2);
+                doc.setFontSize(7);
+                doc.text(appData.pdfSettings.witnessedByName, pageWidth - margin - 40, signatoryY + 6);
+                doc.text(appData.pdfSettings.witnessedByDesignation, pageWidth - margin - 40, signatoryY + 10);
+                
+                // Company Stamp
+                if (appData.pdfSettings.companyStamp) {
+                    doc.setFontSize(6);
+                    doc.setFont('helvetica', 'italic');
+                    doc.text(`Stamp: ${appData.pdfSettings.companyStamp}`, pageWidth / 2, signatoryY + 15, { align: 'center' });
+                }
+                
+                // Footer
+                doc.setFontSize(6);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                
+                // Save PDF
+                const dateStr = formatDateForFile(date);
+                doc.save(`Daily_Report_${dateStr}.pdf`);
+                
+                showToast('Daily PDF exported successfully (1 page)');
+                
+            } catch (error) {
+                console.error('PDF export error:', error);
+                showToast('Error exporting PDF. Please try again.', 'error');
+            }
+        }
+        
+        // Monthly Report Functions
+        function populateYearSelect() {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            
+            yearSelect.innerHTML = '';
+            for (let year = currentYear - 5; year <= currentYear + 1; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                option.selected = year === currentYear;
+                yearSelect.appendChild(option);
+            }
+        }
+        
+        function generateMonthlyReport() {
+            const month = parseInt(document.getElementById('monthSelect').value);
+            const year = parseInt(document.getElementById('yearSelect').value);
+            
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            
+            // Filter reports for selected month/year
+            const monthlyReports = savedReports.filter(report => {
+                const reportDate = new Date(report.date);
+                return reportDate.getMonth() + 1 === month && 
+                       reportDate.getFullYear() === year &&
+                       report.type === 'daily';
+            });
+            
+            if (monthlyReports.length === 0) {
+                showToast('No reports found for selected month', 'error');
+                return;
+            }
+            
+            // Sort by date
+            monthlyReports.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Calculate statistics
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            let totalManpowerDays = 0;
+            let maxManpower = 0;
+            let minManpower = Infinity;
+            let rainyDays = 0;
+            let sunnyDays = 0;
+            let cloudyDays = 0;
+            let totalMaterials = new Set();
+            let totalMachinery = new Set();
+            
+            monthlyReports.forEach(report => {
+                const lines = report.report.split('\n');
+                let dailyManpower = 0;
+                let hasRain = false;
+                
+                lines.forEach(line => {
+                    // Extract manpower
+                    if (line.includes(':') && !line.includes('Time') && !line.includes('Total')) {
+                        const match = line.match(/: (\d+)$/);
+                        if (match) {
+                            dailyManpower += parseInt(match[1]);
+                        }
+                    }
+                    
+                    // Check for rain
+                    if (line.includes('Rain') || line.includes('rain')) {
+                        hasRain = true;
+                    }
+                    
+                    // Extract materials
+                    if (line.includes('.') && (line.includes('Cement') || line.includes('Brick') || line.includes('Steel') || line.includes('Sand'))) {
+                        const material = line.substring(line.indexOf('.') + 2);
+                        totalMaterials.add(material);
+                    }
+                    
+                    // Extract machinery
+                    if (line.includes('.') && (line.includes('Excavator') || line.includes('Crane') || line.includes('Loader') || line.includes('Dozer'))) {
+                        const machine = line.substring(line.indexOf('.') + 2);
+                        totalMachinery.add(machine);
+                    }
+                });
+                
+                totalManpowerDays += dailyManpower;
+                maxManpower = Math.max(maxManpower, dailyManpower);
+                minManpower = Math.min(minManpower, dailyManpower);
+                
+                if (hasRain) rainyDays++;
+                if (lines.some(l => l.includes('Sunny'))) sunnyDays++;
+                if (lines.some(l => l.includes('Cloudy'))) cloudyDays++;
+            });
+            
+            const avgManpower = Math.round(totalManpowerDays / monthlyReports.length);
+            
+            // Generate monthly report
+            let monthlyReport = `MONTHLY CONSTRUCTION REPORT\n`;
+            monthlyReport += `========================================\n\n`;
+            monthlyReport += `Project: GERAI BERSEPADU BELURU\n`;
+            monthlyReport += `Location: LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI\n`;
+            monthlyReport += `Period: ${monthNames[month - 1]} ${year}\n\n`;
+            monthlyReport += `========================================\n`;
+            monthlyReport += `MONTHLY SUMMARY STATISTICS\n`;
+            monthlyReport += `========================================\n\n`;
+            
+            monthlyReport += `Total Working Days: ${monthlyReports.length}\n`;
+            monthlyReport += `Rainy Days: ${rainyDays}\n`;
+            monthlyReport += `Sunny Days: ${sunnyDays}\n`;
+            monthlyReport += `Cloudy Days: ${cloudyDays}\n`;
+            monthlyReport += `Average Daily Manpower: ${avgManpower}\n`;
+            monthlyReport += `Maximum Manpower (single day): ${maxManpower}\n`;
+            monthlyReport += `Minimum Manpower (single day): ${minManpower}\n`;
+            monthlyReport += `Total Manpower Days: ${totalManpowerDays}\n\n`;
+            
+            monthlyReport += `========================================\n`;
+            monthlyReport += `MATERIALS USED THIS MONTH\n`;
+            monthlyReport += `========================================\n\n`;
+            
+            if (totalMaterials.size > 0) {
+                Array.from(totalMaterials).forEach((material, i) => {
+                    monthlyReport += `${i + 1}. ${material}\n`;
+                });
+            } else {
+                monthlyReport += `No materials recorded\n`;
+            }
+            
+            monthlyReport += `\n========================================\n`;
+            monthlyReport += `MACHINERY USED THIS MONTH\n`;
+            monthlyReport += `========================================\n\n`;
+            
+            if (totalMachinery.size > 0) {
+                Array.from(totalMachinery).forEach((machine, i) => {
+                    monthlyReport += `${i + 1}. ${machine}\n`;
+                });
+            } else {
+                monthlyReport += `No machinery recorded\n`;
+            }
+            
+            monthlyReport += `\n========================================\n`;
+            monthlyReport += `DAILY REPORT SUMMARY\n`;
+            monthlyReport += `========================================\n\n`;
+            
+            monthlyReports.forEach((report, index) => {
+                const reportDate = new Date(report.date);
+                const formattedDate = formatDate(reportDate);
+                monthlyReport += `Day ${index + 1}: ${formattedDate}\n`;
+                
+                // Extract first few lines for summary
+                const lines = report.report.split('\n');
+                const summaryLines = lines.slice(0, 5); // Reduced from 8
+                summaryLines.forEach(line => {
+                    monthlyReport += `  ${line}\n`;
+                });
+                monthlyReport += `\n`;
+            });
+            
+            monthlyReport += `\n========================================\n`;
+            monthlyReport += `END OF MONTHLY REPORT\n`;
+            monthlyReport += `Generated: ${new Date().toLocaleString()}\n`;
+            monthlyReport += `========================================\n`;
+            
+            // Display monthly report
+            document.getElementById('monthlyReportOutput').textContent = monthlyReport;
+            document.getElementById('monthlyReportCard').style.display = 'block';
+            
+            // Generate statistics display
+            generateMonthlyStats(monthlyReports, month, year, {
+                totalManpowerDays,
+                maxManpower,
+                minManpower,
+                rainyDays,
+                sunnyDays,
+                cloudyDays,
+                avgManpower,
+                totalMaterials: Array.from(totalMaterials),
+                totalMachinery: Array.from(totalMachinery)
+            });
+            
+            showToast(`Monthly report generated for ${monthNames[month - 1]} ${year}`);
+        }
+        
+        function generateMonthlyStats(reports, month, year, stats) {
+            const statsDiv = document.getElementById('monthlyStats');
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            statsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">📅 Month</div>
+                        <div style="font-size: 1.2rem; color: #3498db;">${monthNames[month - 1]} ${year}</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">📊 Working Days</div>
+                        <div style="font-size: 1.2rem; color: #27ae60;">${reports.length}</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">🌧️ Rainy Days</div>
+                        <div style="font-size: 1.2rem; color: #3498db;">${stats.rainyDays}</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">👷 Avg Manpower</div>
+                        <div style="font-size: 1.2rem; color: #e74c3c;">${stats.avgManpower}</div>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e5eb; margin-bottom: 15px;">
+                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">📈 Manpower Statistics</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
+                            Total Manpower Days: <strong>${stats.totalManpowerDays}</strong>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
+                            Max Daily: <strong>${stats.maxManpower}</strong>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px;">
+                            Min Daily: <strong>${stats.minManpower}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('monthlyStatsCard').style.display = 'block';
+        }
+        
+        function exportMonthlyToPDF() {
+            try {
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                
+                const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+                const monthlyReports = savedReports.filter(report => {
+                    const reportDate = new Date(report.date);
+                    return reportDate.getMonth() + 1 === month && 
+                           reportDate.getFullYear() === year &&
+                           report.type === 'daily';
+                });
+                
+                if (monthlyReports.length === 0) {
+                    showToast('No reports found for selected month', 'error');
+                    return;
+                }
+                
+                // Calculate statistics
+                let totalManpowerDays = 0;
+                let maxManpower = 0;
+                let minManpower = Infinity;
+                let rainyDays = 0;
+                let sunnyDays = 0;
+                let cloudyDays = 0;
+                let totalMaterials = new Set();
+                let totalMachinery = new Set();
+                
+                monthlyReports.forEach(report => {
+                    const lines = report.report.split('\n');
+                    let dailyManpower = 0;
+                    let hasRain = false;
+                    
+                    lines.forEach(line => {
+                        if (line.includes(':') && !line.includes('Time') && !line.includes('Total')) {
+                            const match = line.match(/: (\d+)$/);
+                            if (match) dailyManpower += parseInt(match[1]);
+                        }
+                        if (line.includes('Rain') || line.includes('rain')) hasRain = true;
+                        if (line.includes('.') && (line.includes('Cement') || line.includes('Brick') || line.includes('Steel'))) {
+                            totalMaterials.add(line.substring(line.indexOf('.') + 2));
+                        }
+                        if (line.includes('.') && (line.includes('Excavator') || line.includes('Crane') || line.includes('Loader'))) {
+                            totalMachinery.add(line.substring(line.indexOf('.') + 2));
+                        }
+                    });
+                    
+                    totalManpowerDays += dailyManpower;
+                    maxManpower = Math.max(maxManpower, dailyManpower);
+                    minManpower = Math.min(minManpower, dailyManpower);
+                    if (hasRain) rainyDays++;
+                    if (lines.some(l => l.includes('Sunny'))) sunnyDays++;
+                    if (lines.some(l => l.includes('Cloudy'))) cloudyDays++;
+                });
+                
+                const avgManpower = Math.round(totalManpowerDays / monthlyReports.length);
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const margin = 10;
+                let yPos = 8;
+                
+                // Header
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MONTHLY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 5;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 4;
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 8;
+                
+                // Period
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Period: ${monthNames[month - 1]} ${year}`, margin, yPos);
+                doc.text(`Total Working Days: ${monthlyReports.length}`, pageWidth - margin, yPos, { align: 'right' });
+                yPos += 8;
+                
+                // Summary Statistics Table
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MONTHLY SUMMARY STATISTICS', margin, yPos);
+                yPos += 5;
+                
+                const summaryData = [
+                    ['Rainy Days', rainyDays.toString()],
+                    ['Sunny Days', sunnyDays.toString()],
+                    ['Cloudy Days', cloudyDays.toString()],
+                    ['Average Daily Manpower', avgManpower.toString()],
+                    ['Maximum Manpower', maxManpower.toString()],
+                    ['Minimum Manpower', minManpower.toString()],
+                    ['Total Manpower Days', totalManpowerDays.toString()]
+                ];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Item', 'Quantity']],
+                    body: summaryData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [155, 89, 182], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Materials Table
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MATERIALS USED THIS MONTH', margin, yPos);
+                yPos += 5;
+                
+                const materialData = Array.from(totalMaterials).map(m => [m]);
+                if (materialData.length === 0) materialData.push(['No materials recorded']);
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Material Description']],
+                    body: materialData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Machinery Table
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MACHINERY USED THIS MONTH', margin, yPos);
+                yPos += 5;
+                
+                const machineryData = Array.from(totalMachinery).map(m => [m]);
+                if (machineryData.length === 0) machineryData.push(['No machinery recorded']);
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Machinery / Equipment']],
+                    body: machineryData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [52, 152, 219], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 7
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 5;
+                
+                // Daily Reports Summary Table (Compact)
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text('DAILY REPORTS SUMMARY', margin, yPos);
+                yPos += 5;
+                
+                const dailySummaryData = monthlyReports.map((report, index) => {
+                    const reportDate = new Date(report.date);
+                    const lines = report.report.split('\n');
+                    let manpower = 0;
+                    let weather = '-';
+                    
+                    lines.forEach(line => {
+                        if (line.includes('Total Manpower:')) {
+                            const match = line.match(/Total Manpower: (\d+)/);
+                            if (match) manpower = parseInt(match[1]);
+                        }
+                        if ((line.includes('Sunny') || line.includes('Rain') || line.includes('Cloudy')) && line.includes(':')) {
+                            const parts = line.split(':');
+                            if (parts.length > 1) weather = parts[1].trim().substring(0, 15);
+                        }
+                    });
+                    
+                    return [
+                        (index + 1).toString(),
+                        formatDate(reportDate),
+                        manpower.toString(),
+                        weather
+                    ];
+                });
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['No', 'Date', 'Manpower', 'Weather']],
+                    body: dailySummaryData,
+                    margin: { left: margin, right: margin },
+                    styles: { 
+                        fontSize: 6,
+                        cellPadding: 1,
+                        lineWidth: 0.1
+                    },
+                    headStyles: { 
+                        fillColor: [46, 204, 113], 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        fontSize: 6
+                    },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    columnStyles: {
+                        0: { cellWidth: 8 },
+                        1: { cellWidth: 25 },
+                        2: { cellWidth: 15 },
+                        3: { cellWidth: 30 }
+                    }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+                
+                // Signatory Section
+                const signatoryY = Math.min(yPos, 240);
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Prepared By:', margin, signatoryY);
+                doc.setFont('helvetica', 'normal');
+                doc.line(margin, signatoryY + 2, margin + 40, signatoryY + 2);
+                doc.setFontSize(7);
+                doc.text(appData.pdfSettings.preparedByName, margin, signatoryY + 6);
+                doc.text(appData.pdfSettings.preparedByDesignation, margin, signatoryY + 10);
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Approved By:', pageWidth - margin - 40, signatoryY);
+                doc.setFont('helvetica', 'normal');
+                doc.line(pageWidth - margin - 40, signatoryY + 2, pageWidth - margin, signatoryY + 2);
+                doc.setFontSize(7);
+                doc.text(appData.pdfSettings.witnessedByName, pageWidth - margin - 40, signatoryY + 6);
+                doc.text(appData.pdfSettings.witnessedByDesignation, pageWidth - margin - 40, signatoryY + 10);
+                
+                // Footer
+                doc.setFontSize(6);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`Report Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                
+                // Save PDF
+                doc.save(`Monthly_Report_${monthNames[month - 1]}_${year}.pdf`);
+                
+                showToast('Monthly PDF exported successfully');
+                
+            } catch (error) {
+                console.error('Monthly PDF export error:', error);
+                showToast('Error exporting monthly PDF', 'error');
+            }
+        }
+        
+        // Save Daily Report
+        function saveDailyReport() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report || report.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error');
+                return;
+            }
+            
+            const date = appData.currentDate;
+            const reportId = Date.now();
+            const reportData = {
+                id: reportId,
+                date: date.getTime(),
+                formattedDate: formatDate(date),
+                report: report,
+                type: 'daily',
+                timestamp: new Date().getTime()
+            };
+            
+            let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const existingIndex = savedReports.findIndex(r => 
+                new Date(r.date).toDateString() === date.toDateString()
+            );
+            
+            if (existingIndex !== -1) {
+                savedReports[existingIndex] = reportData;
+                showToast('Report updated successfully');
+            } else {
+                savedReports.push(reportData);
+                showToast('Report saved successfully');
+            }
+            
+            localStorage.setItem('savedReports', JSON.stringify(savedReports));
+            
+            if (document.getElementById('savedTab').classList.contains('active')) {
+                loadSavedReports();
+            }
+        }
+        
+        // Load Saved Reports
+        function loadSavedReports() {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const grid = document.getElementById('savedReportsGrid');
+            const noReportsMsg = document.getElementById('noReportsMessage');
+            
+            if (savedReports.length === 0) {
+                grid.innerHTML = '';
+                noReportsMsg.style.display = 'block';
+                return;
+            }
+            
+            noReportsMsg.style.display = 'none';
+            savedReports.sort((a, b) => b.date - a.date);
+            
+            grid.innerHTML = savedReports.map(report => `
+                <div class="saved-report-card">
+                    <div class="saved-report-date">
+                        ${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}
+                    </div>
+                    <div class="saved-report-preview">
+                        ${report.report.substring(0, 200)}...
+                    </div>
+                    <div class="saved-report-actions">
+                        <button class="saved-report-btn view" onclick="viewSavedReport(${report.id})">
+                            👁️ View
+                        </button>
+                        <button class="saved-report-btn pdf" onclick="exportSavedToPDF(${report.id})">
+                            📄 PDF
+                        </button>
+                        <button class="saved-report-btn delete" onclick="deleteSavedReport(${report.id})">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function viewSavedReports() {
+            switchTab('saved');
+        }
+        
+        function showSavedReports() {
+            switchTab('saved');
+        }
+        
+        function viewSavedReport(reportId) {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const report = savedReports.find(r => r.id === reportId);
+            
+            if (report) {
+                document.getElementById('viewReportTitle').textContent = 
+                    `Report - ${report.formattedDate} ${report.type === 'monthly' ? '(Monthly)' : ''}`;
+                document.getElementById('viewReportContent').textContent = report.report;
+                openModal('viewReportModal');
+            }
+        }
+        
+        function deleteSavedReport(reportId) {
+            if (confirm('Are you sure you want to delete this report?')) {
+                let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+                savedReports = savedReports.filter(r => r.id !== reportId);
+                localStorage.setItem('savedReports', JSON.stringify(savedReports));
+                loadSavedReports();
+                showToast('Report deleted successfully');
+            }
+        }
+        
+        function saveMonthlyReport() {
+            const report = document.getElementById('monthlyReportOutput').textContent;
+            if (!report || report.includes('Monthly report will appear here')) {
+                showToast('Please generate a monthly report first', 'error');
+                return;
+            }
+            
+            const month = parseInt(document.getElementById('monthSelect').value);
+            const year = parseInt(document.getElementById('yearSelect').value);
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            const reportId = Date.now();
+            const reportData = {
+                id: reportId,
+                date: new Date(year, month - 1, 1).getTime(),
+                formattedDate: `${monthNames[month - 1]} ${year}`,
+                report: report,
+                type: 'monthly',
+                timestamp: new Date().getTime()
+            };
+            
+            let savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            savedReports.push(reportData);
+            
+            localStorage.setItem('savedReports', JSON.stringify(savedReports));
+            
+            showToast('Monthly report saved successfully');
+            
+            if (document.getElementById('savedTab').classList.contains('active')) {
+                loadSavedReports();
+            }
+        }
+        
+        // Export Saved Report to PDF
+        function exportSavedToPDF(reportId) {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const report = savedReports.find(r => r.id === reportId);
+            
+            if (!report) {
+                showToast('Report not found', 'error');
+                return;
+            }
+            
+            // For simplicity, we'll just download the text version
+            const blob = new Blob([report.report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Report_${report.formattedDate.replace(/\//g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Report exported as text file');
+        }
+        
+        // Save Report as Text
+        function saveReport() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report || report.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error');
+                return;
+            }
+            
+            const date = formatDateForFile(appData.currentDate);
+            const filename = `Construction_Report_${date}.txt`;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Report saved as: ' + filename);
+        }
+        
+        // Share Functions
+        function showShareOptions() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report || report.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error');
+                return;
+            }
+            
+            openModal('shareModal');
+        }
+        
+        function shareToWhatsApp() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report) return;
+            
+            try {
+                const cleanReport = report
+                    .replace(/\*/g, '')
+                    .replace(/\n{3,}/g, '\n\n')
+                    .trim();
+                
+                const encodedReport = encodeURIComponent(cleanReport);
+                const whatsappUrl = `https://wa.me/?text=${encodedReport}`;
+                
+                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                showToast('Opening WhatsApp...');
+                closeModal();
+                
+            } catch (error) {
+                showToast('Error sharing to WhatsApp. Please copy manually.', 'error');
+                copyToClipboard();
+            }
+        }
+        
+        function shareToEmail() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report) return;
+            
+            const date = formatDate(appData.currentDate);
+            const subject = `Construction Daily Report - ${date}`;
+            const body = encodeURIComponent(report);
+            
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
+            
+            const link = document.createElement('a');
+            link.href = mailtoLink;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('Opening email client...');
+            closeModal();
+        }
+        
+        function copyToClipboard() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report) return;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = report;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('Report copied to clipboard!');
+                } else {
+                    throw new Error('Copy command failed');
+                }
+            } catch (err) {
+                navigator.clipboard.writeText(report).then(() => {
+                    showToast('Report copied to clipboard!');
+                }).catch(() => {
+                    showToast('Failed to copy. Please select and copy manually.', 'error');
+                });
+            }
+            
+            document.body.removeChild(textarea);
+            closeModal();
+        }
+        
+        function printReport() {
+            const report = document.getElementById('reportOutput').textContent;
+            if (!report || report.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error');
+                return;
+            }
+            
+            try {
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    showToast('Popup blocked. Please allow popups to print.', 'error');
+                    return;
+                }
+                
+                const date = appData.currentDate;
+                const formattedDate = formatDate(date);
+                const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Construction Report - ${formattedDate}</title>
+                        <style>
+                            @media print {
+                                @page { 
+                                    size: A4; 
+                                    margin: 10mm; 
+                                }
+                                body { 
+                                    font-family: Arial, sans-serif; 
+                                    font-size: 10pt; 
+                                    line-height: 1.3;
+                                }
+                            }
+                            body { 
+                                margin: 0; 
+                                padding: 15px; 
+                                max-width: 210mm;
+                                font-family: Arial, sans-serif;
+                                font-size: 10pt;
+                                line-height: 1.3;
+                            }
+                            .header { 
+                                text-align: center; 
+                                margin-bottom: 15px; 
+                                border-bottom: 2px solid #000; 
+                                padding-bottom: 10px;
+                            }
+                            .report-content { 
+                                white-space: pre-wrap; 
+                                font-family: 'Courier New', monospace; 
+                                font-size: 8pt;
+                            }
+                            .footer { 
+                                margin-top: 20px; 
+                                padding-top: 10px; 
+                                border-top: 1px solid #ccc; 
+                                font-size: 7pt; 
+                                text-align: center; 
+                                color: #666;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1 style="margin: 0; font-size: 14pt;">GERAI BERSEPADU BELURU</h1>
+                            <h2 style="margin: 5px 0; font-size: 10pt;">Construction Daily Report</h2>
+                            <p style="margin: 0;"><strong>Date:</strong> ${formattedDate} | <strong>Day:</strong> ${dayOfWeek}</p>
+                        </div>
+                        <div class="report-content">${report}</div>
+                        <div class="footer">
+                            <p>Generated using Construction Daily Report System</p>
+                            <p>Printed on: ${new Date().toLocaleString()}</p>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(function() {
+                                    window.close();
+                                }, 500);
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                
+                closeModal();
+                showToast('Opening print dialog...');
+                
+            } catch (error) {
+                showToast('Error opening print dialog.', 'error');
+            }
+        }
+        
+        // Clear Data
+        function showClearModal() {
+            openModal('clearModal');
+        }
+        
+        function clearAllData() {
+            if (!confirm('This will clear all form data but keep saved reports. Continue?')) {
+                closeModal();
+                return;
+            }
+            
+            appData.currentDate = new Date();
+            updateDateDisplay();
+            
+            appData.weatherPeriods = 1;
+            const weatherContainer = document.getElementById('weatherContainer');
+            weatherContainer.innerHTML = `
+                <div class="weather-card">
+                    <div class="weather-row">
+                        <div class="time-input-group">
+                            <input type="time" class="time-input" value="08:00" id="weatherStart1">
+                            <span class="time-separator">to</span>
+                            <input type="time" class="time-input" value="17:00" id="weatherEnd1">
+                        </div>
+                        
+                        <select class="condition-select" id="weatherCondition1">
+                            <option value="Sunny">☀️ Sunny</option>
+                            <option value="Partly Cloudy">⛅ Partly Cloudy</option>
+                            <option value="Cloudy">☁️ Cloudy</option>
+                            <option value="Rainy">🌧️ Rainy</option>
+                            <option value="Heavy Rain">⛈️ Heavy Rain</option>
+                            <option value="Thunderstorm">⚡ Thunderstorm</option>
+                            <option value="Foggy">🌫️ Foggy</option>
+                            <option value="Windy">💨 Windy</option>
+                            <option value="Clear Night">🌙 Clear Night</option>
+                        </select>
+                        
+                        <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes1">
+                    </div>
+                </div>
+            `;
+            
+            appData.manpower.forEach(person => {
+                if (person.id === 'sg') {
+                    person.value = 1;
+                } else {
+                    person.value = 0;
+                }
+            });
+            initManpowerGrid();
+            
+            resetList('materialList', 'NIL');
+            resetList('machineryList', 'Excavator - 1');
+            resetList('activityList', 'No Activity');
+            resetList('worksList', 'N/A');
+            resetList('remarksList', 'N/A');
+            
+            document.getElementById('reportCard').style.display = 'none';
+            
+            closeModal();
+            showToast('All form data cleared');
+        }
+        
+        function resetList(containerId, defaultValue) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="list-item">
+                    <input type="text" class="list-input" value="${defaultValue}">
+                    <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                </div>
+            `;
+        }
+        
+        // Storage Functions
+        function saveToStorage() {
+            try {
+                const data = {
+                    date: appData.currentDate.getTime(),
+                    weatherPeriods: appData.weatherPeriods,
+                    manpower: appData.manpower,
+                    materials: getListValues('materialList'),
+                    machinery: getListValues('machineryList'),
+                    activities: getListValues('activityList'),
+                    works: getListValues('worksList'),
+                    remarks: getListValues('remarksList'),
+                    savedAt: new Date().getTime()
+                };
+                
+                data.weather = {};
+                for (let i = 1; i <= appData.weatherPeriods; i++) {
+                    const start = document.getElementById(`weatherStart${i}`)?.value;
+                    const end = document.getElementById(`weatherEnd${i}`)?.value;
+                    const condition = document.getElementById(`weatherCondition${i}`)?.value;
+                    const notes = document.getElementById(`weatherNotes${i}`)?.value;
+                    
+                    if (start && end) {
+                        data.weather[i] = { start, end, condition, notes };
+                    }
+                }
+                
+                localStorage.setItem('constructionReportData', JSON.stringify(data));
+            } catch (e) {
+                console.error('Error saving data:', e);
+            }
+        }
+        
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem('constructionReportData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    
+                    const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                    if (data.savedAt && data.savedAt > weekAgo) {
+                        if (data.date) {
+                            appData.currentDate = new Date(data.date);
+                            updateDateDisplay();
+                        }
+                        
+                        if (data.weatherPeriods) {
+                            appData.weatherPeriods = data.weatherPeriods;
+                            const weatherContainer = document.getElementById('weatherContainer');
+                            weatherContainer.innerHTML = '';
+                            
+                            for (let i = 1; i <= appData.weatherPeriods; i++) {
+                                const weatherData = data.weather?.[i] || {};
+                                const card = document.createElement('div');
+                                card.className = 'weather-card';
+                                card.innerHTML = `
+                                    <div class="weather-row">
+                                        <div class="time-input-group">
+                                            <input type="time" class="time-input" value="${weatherData.start || '08:00'}" id="weatherStart${i}">
+                                            <span class="time-separator">to</span>
+                                            <input type="time" class="time-input" value="${weatherData.end || '17:00'}" id="weatherEnd${i}">
+                                        </div>
+                                        
+                                        <select class="condition-select" id="weatherCondition${i}">
+                                            <option value="Sunny" ${weatherData.condition === 'Sunny' ? 'selected' : ''}>☀️ Sunny</option>
+                                            <option value="Partly Cloudy" ${weatherData.condition === 'Partly Cloudy' ? 'selected' : ''}>⛅ Partly Cloudy</option>
+                                            <option value="Cloudy" ${weatherData.condition === 'Cloudy' ? 'selected' : ''}>☁️ Cloudy</option>
+                                            <option value="Rainy" ${weatherData.condition === 'Rainy' ? 'selected' : ''}>🌧️ Rainy</option>
+                                            <option value="Heavy Rain" ${weatherData.condition === 'Heavy Rain' ? 'selected' : ''}>⛈️ Heavy Rain</option>
+                                            <option value="Thunderstorm" ${weatherData.condition === 'Thunderstorm' ? 'selected' : ''}>⚡ Thunderstorm</option>
+                                            <option value="Foggy" ${weatherData.condition === 'Foggy' ? 'selected' : ''}>🌫️ Foggy</option>
+                                            <option value="Windy" ${weatherData.condition === 'Windy' ? 'selected' : ''}>💨 Windy</option>
+                                            <option value="Clear Night" ${weatherData.condition === 'Clear Night' ? 'selected' : ''}>🌙 Clear Night</option>
+                                        </select>
+                                        
+                                        <input type="text" class="form-input" placeholder="Additional notes (optional)" id="weatherNotes${i}" value="${weatherData.notes || ''}">
+                                    </div>
+                                `;
+                                weatherContainer.appendChild(card);
+                            }
+                        }
+                        
+                        if (data.manpower) {
+                            appData.manpower = data.manpower;
+                            initManpowerGrid();
+                        }
+                        
+                        loadList('materialList', data.materials || ['NIL']);
+                        loadList('machineryList', data.machinery || ['Excavator - 1']);
+                        loadList('activityList', data.activities || ['No Activity']);
+                        loadList('worksList', data.works || ['N/A']);
+                        loadList('remarksList', data.remarks || ['N/A']);
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+        
+        function loadList(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <input type="text" class="list-input" value="${item}">
+                    <button class="remove-btn" onclick="removeListItem(this)">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+        
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = type === 'error' ? '#e74c3c' : '#27ae60';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Event Listeners
+        function setupEventListeners() {
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('time-input') || 
+                    e.target.classList.contains('condition-select') ||
+                    e.target.classList.contains('form-input') ||
+                    e.target.classList.contains('list-input')) {
+                    saveToStorage();
+                }
+            });
+            
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
