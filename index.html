@@ -1,28 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Title</title>
-    <script>
-        // Password protection script
-        function checkPassword() {
-            if (sessionStorage.getItem('loggedIn') !== 'true') {
-                var password = prompt('Enter the password:');
-                if (password === 'rsbeluru') {
-                    sessionStorage.setItem('loggedIn', 'true');
-                } else {
-                    alert('Access denied!');
-                    document.body.innerHTML = ''; // Clear content
-                }
-            }
-        }
-        checkPassword();
-    </script>
+    <title>My Page</title>
 </head>
 <body>
-    <!-- Existing content here -->
-    <h1>Welcome to Gerai Beluru</h1>
-    <p>Your existing content.</p>
+    <h1>Welcome to My Page</h1>
+    <p>This is a sample page.</p>
 </body>
 </html>
