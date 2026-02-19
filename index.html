@@ -6,16 +6,9 @@
     <meta name="theme-color" content="#2c3e50">
     <meta name="description" content="Construction Daily Report System - Gerai Bersepadu Beluru">
     <title>📋 Construction Daily Report - Gerai Bersepadu Beluru</title>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
         /* Reset & Base Styles */
         * {
@@ -33,72 +26,6 @@
             min-height: 100vh;
             padding: 0;
             overflow-x: hidden;
-        }
-        
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 20000;
-            color: white;
-        }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Cloud Status Indicator */
-        .cloud-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 2000;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .cloud-status.online {
-            background: rgba(46, 204, 113, 0.95);
-            color: white;
-            border: 2px solid #27ae60;
-        }
-        
-        .cloud-status.offline {
-            background: rgba(231, 76, 60, 0.95);
-            color: white;
-            border: 2px solid #c0392b;
-        }
-        
-        .cloud-status.syncing {
-            background: rgba(241, 196, 15, 0.95);
-            color: white;
-            border: 2px solid #f39c12;
         }
         
         /* Login Screen */
@@ -182,38 +109,6 @@
             display: none;
         }
         
-        /* Auth Options */
-        .auth-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .auth-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .auth-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .auth-btn.google {
-            background: #db4437;
-            color: white;
-        }
-        
-        .auth-btn.anonymous {
-            background: #7f8c8d;
-            color: white;
-        }
-        
         /* Password Change Modal */
         .password-change-container {
             max-width: 400px;
@@ -253,44 +148,6 @@
         .header-controls {
             display: flex;
             gap: 10px;
-            align-items: center;
-        }
-        
-        /* User Profile */
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-right: 10px;
-            padding: 5px 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-        }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #3498db;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        
-        .user-info {
-            font-size: 0.8rem;
-        }
-        
-        .user-email {
-            font-weight: 600;
-        }
-        
-        .sync-status {
-            font-size: 0.7rem;
-            opacity: 0.8;
         }
         
         .header-btn {
@@ -861,42 +718,6 @@
             color: white;
         }
         
-        /* Cloud Data Tab */
-        .cloud-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .cloud-stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .cloud-stat-card {
-            padding: 20px;
-            border-radius: 12px;
-            color: white;
-        }
-        
-        .cloud-stat-card.storage {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-        
-        .cloud-stat-card.sync {
-            background: linear-gradient(135deg, #27ae60, #219653);
-        }
-        
-        .cloud-sync-controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
         /* Modal */
         .modal {
             display: none;
@@ -965,10 +786,6 @@
             background: #e74c3c;
         }
         
-        .toast.warning {
-            background: #f39c12;
-        }
-        
         /* Footer */
         .footer {
             text-align: center;
@@ -1009,14 +826,6 @@
             .header-controls {
                 width: 100%;
                 justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .user-profile {
-                order: -1;
-                width: 100%;
-                justify-content: center;
-                margin: 10px 0;
             }
             
             .monthly-controls {
@@ -1037,10 +846,6 @@
             
             .weather-row {
                 grid-template-columns: 1fr;
-            }
-            
-            .cloud-sync-controls {
-                flex-direction: column;
             }
         }
         
@@ -1289,93 +1094,19 @@
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-        
-        /* Devices List */
-        .devices-list {
-            margin-top: 20px;
-        }
-        
-        .device-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .device-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .device-icon {
-            font-size: 1.5rem;
-        }
-        
-        .device-details {
-            font-size: 0.9rem;
-        }
-        
-        .device-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .device-time {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-        }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <div id="loadingMessage">Loading...</div>
-    </div>
-    
-    <!-- Cloud Status Indicator -->
-    <div id="cloudStatus" class="cloud-status offline">
-        <span id="cloudStatusIcon">☁️</span>
-        <span id="cloudStatusText">Offline</span>
-    </div>
-    
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="login-container">
             <h1 class="login-title">🔒 Construction Report System</h1>
-            <p class="login-subtitle">Cloud-Enabled • Multi-Device Sync</p>
+            <p class="login-subtitle">Authorized Access Only</p>
             
-            <!-- Local Password Login -->
-            <div id="localAuth">
-                <input type="password" id="localPasswordInput" class="login-input" placeholder="Enter local password" autocomplete="off">
-                <div id="loginError" class="login-error">Incorrect password</div>
-                <button id="localLoginBtn" class="login-btn">Login Locally</button>
-                <div style="margin-top: 15px; text-align: center;">
-                    <a href="#" onclick="showFirebaseAuth()" style="color: #3498db; text-decoration: none;">Use Cloud Sync (Recommended)</a>
-                </div>
-            </div>
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off">
+            <div id="loginError" class="login-error">Incorrect password</div>
             
-            <!-- Firebase Auth -->
-            <div id="firebaseAuth" style="display: none;">
-                <input type="email" id="emailInput" class="login-input" placeholder="Email address">
-                <input type="password" id="passwordInput" class="login-input" placeholder="Password">
-                <div id="firebaseLoginError" class="login-error" style="display: none;"></div>
-                <button id="firebaseLoginBtn" class="login-btn" style="background: #4285f4;">Login with Email</button>
-                
-                <div class="auth-options">
-                    <button class="auth-btn google" onclick="firebaseGoogleLogin()">Google</button>
-                    <button class="auth-btn anonymous" onclick="firebaseAnonymousLogin()">Anonymous</button>
-                </div>
-                
-                <div style="margin-top: 15px; text-align: center;">
-                    <a href="#" onclick="showSignup()" style="color: #3498db; text-decoration: none;">Create Account</a> • 
-                    <a href="#" onclick="showLocalAuth()" style="color: #7f8c8d; text-decoration: none;">Local Login</a>
-                </div>
-            </div>
+            <button id="loginBtn" class="login-btn">Login</button>
         </div>
     </div>
     
@@ -1385,20 +1116,12 @@
         <div class="header">
             <div class="header-content">
                 <h1>GERAI BERSEPADU BELURU</h1>
-                <h2>Construction Daily Report System • Cloud v2.0</h2>
+                <h2>Construction Daily Report System</h2>
             </div>
             <div class="header-controls">
-                <div class="user-profile">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <div class="user-info">
-                        <div class="user-email" id="userEmail">user@example.com</div>
-                        <div class="sync-status" id="syncStatus">Last sync: --</div>
-                    </div>
-                </div>
                 <button class="header-btn" onclick="showChangePassword()">🔐</button>
                 <button class="header-btn" onclick="showSavedReports()">📁</button>
                 <button class="header-btn" onclick="showDataManagement()">💾</button>
-                <button class="header-btn" onclick="syncNow()" title="Sync with Cloud">🔄</button>
                 <button class="header-btn" onclick="logout()">🚪</button>
             </div>
         </div>
@@ -1410,7 +1133,6 @@
                 <button class="tab active" onclick="switchTab('daily')">📅 Daily Report</button>
                 <button class="tab" onclick="switchTab('monthly')">📊 Monthly Report</button>
                 <button class="tab" onclick="switchTab('saved')">💾 Saved Reports</button>
-                <button class="tab" onclick="switchTab('cloud')">☁️ Cloud Data</button>
             </div>
             
             <!-- Daily Report Tab -->
@@ -1605,9 +1327,6 @@
                         <button class="action-btn info" onclick="saveDailyReport()">
                             💾 Save Report
                         </button>
-                        <button class="action-btn success" onclick="syncNow()">
-                            ☁️ Sync to Cloud
-                        </button>
                     </div>
                 </div>
                 
@@ -1686,9 +1405,6 @@
                         <button class="action-btn warning" onclick="showPdfSettings('monthly')">
                             📄 Export to PDF
                         </button>
-                        <button class="action-btn info" onclick="syncMonthlyToCloud()">
-                            ☁️ Sync to Cloud
-                        </button>
                     </div>
                 </div>
             </div>
@@ -1702,9 +1418,6 @@
                     <div class="action-buttons" style="margin-bottom: 20px;">
                         <button class="action-btn primary" onclick="loadSavedReports()">
                             🔄 Refresh List
-                        </button>
-                        <button class="action-btn info" onclick="loadReportsFromCloud()">
-                            ☁️ Load from Cloud
                         </button>
                         <button class="action-btn danger" onclick="deleteAllReports()">
                             🗑️ Delete All Reports
@@ -1721,82 +1434,11 @@
                 </div>
             </div>
             
-            <!-- Cloud Data Tab -->
-            <div id="cloudTab" class="tab-content">
-                <div class="card">
-                    <div class="section-title">☁️ Cloud Data Management</div>
-                    
-                    <div class="cloud-stats-grid">
-                        <div class="cloud-stat-card storage">
-                            <h3 style="margin-bottom: 10px;">📊 Cloud Storage</h3>
-                            <p>Reports stored securely in the cloud</p>
-                            <div style="margin-top: 15px;">
-                                <div>Daily Reports: <span id="cloudDailyCount">0</span></div>
-                                <div>Saved Reports: <span id="cloudSavedCount">0</span></div>
-                                <div>Storage Used: <span id="cloudStorageUsed">0 KB</span></div>
-                            </div>
-                        </div>
-                        
-                        <div class="cloud-stat-card sync">
-                            <h3 style="margin-bottom: 10px;">🔄 Sync Status</h3>
-                            <p>Real-time synchronization across devices</p>
-                            <div style="margin-top: 15px;">
-                                <div>Last Sync: <span id="lastSyncTime">Never</span></div>
-                                <div>Status: <span id="syncStatusText">Disconnected</span></div>
-                                <div>Auto-sync: <span id="autoSyncStatus">Off</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="cloud-sync-controls">
-                        <button class="action-btn success" onclick="syncNow()">
-                            🔄 Sync Now
-                        </button>
-                        <button class="action-btn warning" onclick="syncCloudToLocal()">
-                            ⬇️ Download from Cloud
-                        </button>
-                        <button class="action-btn primary" onclick="syncLocalToCloud()">
-                            ⬆️ Upload to Cloud
-                        </button>
-                        <button class="action-btn secondary" onclick="showFirebaseConfig()">
-                            ⚙️ Firebase Settings
-                        </button>
-                    </div>
-                    
-                    <div class="section-title" style="margin-top: 30px;">📱 Connected Device</div>
-                    <div id="devicesList" class="devices-list">
-                        <div class="device-item">
-                            <div class="device-info">
-                                <div class="device-icon">📱</div>
-                                <div class="device-details">
-                                    <div class="device-name" id="currentDeviceName">This Device</div>
-                                    <div class="device-time">Connected: <span id="deviceConnectionTime">Just now</span></div>
-                                </div>
-                            </div>
-                            <div style="font-size: 0.8rem; color: #27ae60; font-weight: bold;">
-                                Active
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="section-title" style="margin-top: 30px;">⚠️ Cloud Settings</div>
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                        <p style="color: #856404; margin-bottom: 10px;"><strong>Important:</strong> To use cloud features, you need to:</p>
-                        <ol style="color: #856404; padding-left: 20px;">
-                            <li>Create a Firebase project at <a href="https://firebase.google.com" target="_blank" style="color: #3498db;">firebase.google.com</a></li>
-                            <li>Enable Authentication (Email/Password) and Firestore Database</li>
-                            <li>Copy your Firebase configuration and paste it in Settings</li>
-                            <li>Share the configuration with team members for multi-device access</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Footer -->
             <div class="footer">
-                <p>© 2024 Construction Daily Report System • Cloud v2.0</p>
-                <p style="font-size: 0.8rem; margin-top: 5px;">Data synchronized via Firebase • All data stored securely</p>
-                <p style="font-size: 0.8rem; margin-top: 5px;">v6.0 • Enhanced Cloud Sync • Multi-Device Support • Real-time Updates</p>
+                <p>© 2024 Construction Daily Report System</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">All data stored locally on your device</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">v5.8 • Enhanced Monthly Reports • Weather Analytics • Data Export/Import</p>
             </div>
         </div>
     </div>
@@ -1960,12 +1602,6 @@
                 <button class="action-btn info" onclick="importData()">
                     📥 Import Data
                 </button>
-                <button class="action-btn warning" onclick="clearAllLocalData()">
-                    🗑️ Clear Local Data
-                </button>
-                <button class="action-btn danger" onclick="clearCloudData()">
-                    ☁️ Clear Cloud Data
-                </button>
             </div>
             
             <div id="importStatus" class="import-status"></div>
@@ -1988,100 +1624,10 @@
         </div>
     </div>
     
-    <!-- Signup Modal -->
-    <div id="signupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">👤 Create Account</div>
-            <input type="email" id="signupEmail" class="form-input" placeholder="Email address" style="margin-bottom: 15px;">
-            <input type="password" id="signupPassword" class="form-input" placeholder="Password (min 6 characters)" style="margin-bottom: 15px;">
-            <input type="password" id="confirmSignupPassword" class="form-input" placeholder="Confirm password" style="margin-bottom: 15px;">
-            <div id="signupError" style="color: #e74c3c; margin-bottom: 15px; display: none;"></div>
-            <div class="action-buttons">
-                <button class="action-btn primary" onclick="createAccount()">
-                    Create Account
-                </button>
-                <button class="action-btn secondary" onclick="closeModal()">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Firebase Config Modal -->
-    <div id="firebaseConfigModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">⚙️ Firebase Configuration</div>
-            <p style="margin-bottom: 20px;">Enter your Firebase configuration to enable cloud sync:</p>
-            
-            <div class="form-group">
-                <label class="form-label">API Key:</label>
-                <input type="text" id="firebaseApiKey" class="form-input" placeholder="AIzaSy...">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Auth Domain:</label>
-                <input type="text" id="firebaseAuthDomain" class="form-input" placeholder="your-project.firebaseapp.com">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Project ID:</label>
-                <input type="text" id="firebaseProjectId" class="form-input" placeholder="your-project-id">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Storage Bucket:</label>
-                <input type="text" id="firebaseStorageBucket" class="form-input" placeholder="your-project.appspot.com">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Messaging Sender ID:</label>
-                <input type="text" id="firebaseMessagingSenderId" class="form-input" placeholder="1234567890">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">App ID:</label>
-                <input type="text" id="firebaseAppId" class="form-input" placeholder="1:1234567890:web:abcdef">
-            </div>
-            
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="color: #1565c0; margin-bottom: 10px;"><strong>How to get these values:</strong></p>
-                <ol style="color: #1565c0; padding-left: 20px; font-size: 0.9rem;">
-                    <li>Go to <a href="https://firebase.google.com" target="_blank" style="color: #2196f3;">firebase.google.com</a></li>
-                    <li>Create a new project</li>
-                    <li>Enable Authentication (Email/Password) and Firestore Database</li>
-                    <li>Register a web app to get your configuration</li>
-                </ol>
-            </div>
-            
-            <div id="firebaseConfigError" style="color: #e74c3c; margin-top: 15px; display: none;"></div>
-            
-            <div class="action-buttons" style="margin-top: 20px;">
-                <button class="action-btn success" onclick="saveFirebaseConfig()">
-                    Save Configuration
-                </button>
-                <button class="action-btn secondary" onclick="closeModal()">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-        const DEFAULT_PASSWORD = 'beluru123';
-        const PASSWORD_KEY = 'construction_report_password';
-        
-        let firebaseApp = null;
-        let firebaseAuth = null;
-        let firestore = null;
-        let currentUser = null;
-        let isOnline = navigator.onLine;
-        let syncInterval = null;
-        let autoSyncEnabled = true;
-        
         // ==================== APP DATA & CONFIGURATION ====================
         const appData = {
             currentDate: new Date(),
@@ -2111,122 +1657,42 @@
                 witnessedByName: 'Project Manager',
                 witnessedByDesignation: 'Project Manager',
                 companyStamp: ''
-            },
-            cloudSettings: {
-                useCloud: false,
-                firebaseConfig: null,
-                autoSync: true,
-                syncFrequency: 5 // minutes
             }
         };
+        
+        const PASSWORD_KEY = 'construction_report_password';
+        const DEFAULT_PASSWORD = 'beluru123';
         
         let currentReportText = '';
         let currentPdfType = '';
         
         // ==================== INITIALIZATION ====================
         function initApp() {
-            // Load saved settings
-            loadCloudSettings();
+            if (!localStorage.getItem(PASSWORD_KEY)) {
+                localStorage.setItem(PASSWORD_KEY, DEFAULT_PASSWORD);
+            }
+            
+            setupLogin();
+            populateYearSelect();
             loadPdfSettings();
             
-            // Setup event listeners
-            setupLogin();
-            setupNetworkListener();
-            populateYearSelect();
-            
-            // Generate device ID if not exists
-            if (!localStorage.getItem('deviceId')) {
-                const deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + 
-                               '_' + new Date().getTime().toString(36);
-                localStorage.setItem('deviceId', deviceId);
-                localStorage.setItem('deviceName', navigator.userAgent.substring(0, 50));
-            }
-            
-            // Check if already logged in
             if (localStorage.getItem('isLoggedIn') === 'true') {
-                if (appData.cloudSettings.useCloud && appData.cloudSettings.firebaseConfig) {
-                    initializeFirebase();
-                } else {
-                    loginSuccess();
-                }
-            }
-            
-            // Initial cloud status update
-            updateCloudStatus(isOnline);
-        }
-        
-        // ==================== FIREBASE FUNCTIONS ====================
-        function initializeFirebase() {
-            try {
-                const config = appData.cloudSettings.firebaseConfig;
-                if (!config || !config.apiKey || config.apiKey === 'AIzaSyCHANGE_THIS_WITH_YOUR_KEY') {
-                    console.log('No valid Firebase config found');
-                    return;
-                }
-                
-                firebaseApp = firebase.initializeApp(config);
-                firebaseAuth = firebase.auth();
-                firestore = firebase.firestore();
-                
-                // Enable offline persistence
-                firestore.enablePersistence()
-                    .then(() => console.log('Firestore persistence enabled'))
-                    .catch(err => console.warn('Persistence failed:', err.code));
-                
-                // Setup auth listener
-                firebaseAuth.onAuthStateChanged((user) => {
-                    currentUser = user;
-                    if (user) {
-                        console.log('User authenticated:', user.email || 'Anonymous');
-                        updateUserInfo(user);
-                        startAutoSync();
-                        loadCloudData();
-                        // Auto-login to main app
-                        if (!appData.isLoggedIn) {
-                            loginSuccess();
-                        }
-                    } else {
-                        console.log('User signed out');
-                        stopAutoSync();
-                    }
-                });
-                
-                updateCloudStatus(true);
-                
-            } catch (error) {
-                console.error('Firebase initialization error:', error);
-                updateCloudStatus(false);
-                showToast('Firebase config error. Please check settings.', 'error');
+                loginSuccess();
             }
         }
         
-        // ==================== AUTHENTICATION ====================
+        // ==================== LOGIN SYSTEM ====================
         function setupLogin() {
-            // Local login
-            document.getElementById('localLoginBtn').addEventListener('click', attemptLocalLogin);
-            document.getElementById('localPasswordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') attemptLocalLogin();
-            });
-            
-            // Firebase login
-            document.getElementById('firebaseLoginBtn').addEventListener('click', firebaseEmailLogin);
-            document.getElementById('emailInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') firebaseEmailLogin();
-            });
+            document.getElementById('loginBtn').addEventListener('click', attemptLogin);
             document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') firebaseEmailLogin();
+                if (e.key === 'Enter') attemptLogin();
             });
-            
-            // Focus on input
-            setTimeout(() => {
-                const localInput = document.getElementById('localPasswordInput');
-                if (localInput) localInput.focus();
-            }, 100);
+            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
         }
         
-        function attemptLocalLogin() {
-            const input = document.getElementById('localPasswordInput').value;
-            const storedPassword = localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD;
+        function attemptLogin() {
+            const input = document.getElementById('passwordInput').value;
+            const storedPassword = localStorage.getItem(PASSWORD_KEY);
             const errorDiv = document.getElementById('loginError');
             
             if (!input) {
@@ -2241,143 +1707,17 @@
             } else {
                 errorDiv.textContent = 'Incorrect password';
                 errorDiv.style.display = 'block';
-                document.getElementById('localPasswordInput').value = '';
-                document.getElementById('localPasswordInput').focus();
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
                 const loginContainer = document.querySelector('.login-container');
                 loginContainer.style.animation = 'shake 0.5s';
                 setTimeout(() => loginContainer.style.animation = '', 500);
             }
         }
         
-        async function firebaseEmailLogin() {
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            const errorDiv = document.getElementById('firebaseLoginError');
-            
-            errorDiv.style.display = 'none';
-            
-            if (!email || !password) {
-                errorDiv.textContent = 'Please enter email and password';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            showLoading('Logging in...');
-            
-            try {
-                // Initialize Firebase if not already done
-                if (!firebaseApp && appData.cloudSettings.firebaseConfig) {
-                    initializeFirebase();
-                    // Wait a bit for initialization
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-                
-                if (!firebaseAuth) {
-                    throw new Error('Firebase not initialized. Please check configuration.');
-                }
-                
-                await firebaseAuth.signInWithEmailAndPassword(email, password);
-                showToast('Logged in successfully');
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'Login failed: ' + error.message;
-                errorDiv.style.display = 'block';
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        async function firebaseGoogleLogin() {
-            if (!firebaseAuth) {
-                showToast('Please configure Firebase first', 'error');
-                return;
-            }
-            
-            showLoading('Connecting to Google...');
-            
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await firebaseAuth.signInWithPopup(provider);
-                showToast('Logged in with Google');
-                
-            } catch (error) {
-                console.error('Google login error:', error);
-                showToast('Google login failed: ' + error.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        async function firebaseAnonymousLogin() {
-            if (!firebaseAuth) {
-                showToast('Please configure Firebase first', 'error');
-                return;
-            }
-            
-            showLoading('Setting up anonymous session...');
-            
-            try {
-                await firebaseAuth.signInAnonymously();
-                showToast('Anonymous session started');
-                
-            } catch (error) {
-                console.error('Anonymous login error:', error);
-                showToast('Anonymous login failed: ' + error.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        async function createAccount() {
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirm = document.getElementById('confirmSignupPassword').value;
-            const errorDiv = document.getElementById('signupError');
-            
-            errorDiv.style.display = 'none';
-            
-            if (!email || !password || !confirm) {
-                errorDiv.textContent = 'All fields are required';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (password.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (password !== confirm) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            showLoading('Creating account...');
-            
-            try {
-                if (!firebaseAuth) {
-                    throw new Error('Firebase not initialized');
-                }
-                
-                await firebaseAuth.createUserWithEmailAndPassword(email, password);
-                showToast('Account created successfully');
-                closeModal();
-                
-            } catch (error) {
-                errorDiv.textContent = 'Error: ' + error.message;
-                errorDiv.style.display = 'block';
-            } finally {
-                hideLoading();
-            }
-        }
-        
         function loginSuccess() {
             appData.isLoggedIn = true;
             localStorage.setItem('isLoggedIn', 'true');
-            
             document.getElementById('loginScreen').classList.add('hidden');
             
             setTimeout(() => {
@@ -2388,547 +1728,30 @@
                 setupEventListeners();
                 loadDataForCurrentDate();
                 loadSavedReports();
+                document.getElementById('weatherStart1').value = "08:00";
+                document.getElementById('weatherEnd1').value = "17:00";
                 updatePhysicalProgress();
                 updateFinancialProgress();
-                showToast('Welcome to Construction Report System v6.0!');
-                
-                // Update cloud stats if using cloud
-                if (appData.cloudSettings.useCloud) {
-                    updateCloudStats();
-                }
+                showToast('Welcome to Construction Report System v5.8!');
             }, 300);
         }
         
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 saveDataForCurrentDate();
-                stopAutoSync();
-                
-                if (firebaseAuth) {
-                    firebaseAuth.signOut();
-                }
-                
                 appData.isLoggedIn = false;
                 localStorage.removeItem('isLoggedIn');
-                
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('loginScreen').style.display = 'flex';
                 document.getElementById('loginScreen').classList.remove('hidden');
-                
-                // Reset login forms
-                document.getElementById('localPasswordInput').value = '';
-                document.getElementById('emailInput').value = '';
                 document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
                 document.getElementById('loginError').style.display = 'none';
-                document.getElementById('firebaseLoginError').style.display = 'none';
-                
-                // Show local auth by default
-                showLocalAuth();
-                
                 showToast('Logged out successfully');
             }
         }
         
-        // ==================== CLOUD DATA FUNCTIONS ====================
-        async function saveToCloud() {
-            if (!currentUser || !isOnline) return false;
-            
-            try {
-                updateCloudStatus(true, 'syncing');
-                
-                const date = appData.currentDate;
-                const dateKey = formatDateForStorage(date);
-                const userId = currentUser.uid;
-                const deviceId = localStorage.getItem('deviceId') || 'unknown';
-                
-                // Prepare data for cloud
-                const cloudData = {
-                    date: date.toISOString(),
-                    userId: userId,
-                    userEmail: currentUser.email || 'anonymous',
-                    deviceId: deviceId,
-                    deviceName: localStorage.getItem('deviceName') || navigator.userAgent.substring(0, 50),
-                    progress: appData.progress,
-                    manpower: appData.manpower,
-                    weatherData: getWeatherData(),
-                    materials: getListValues('materialList'),
-                    machinery: getListValues('machineryList'),
-                    activities: getListValues('activityList'),
-                    works: getListValues('worksList'),
-                    remarks: getListValues('remarksList'),
-                    lastModified: firebase.firestore.FieldValue.serverTimestamp(),
-                    version: '2.0'
-                };
-                
-                // Save to Firestore
-                await firestore.collection('dailyReports')
-                    .doc(`${userId}_${dateKey}`)
-                    .set(cloudData, { merge: true });
-                
-                // Update sync timestamp
-                localStorage.setItem('lastCloudSync', new Date().toISOString());
-                updateSyncStatus();
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Cloud save error:', error);
-                return false;
-            } finally {
-                updateCloudStatus(isOnline);
-            }
-        }
-        
-        async function loadFromCloud(date = null) {
-            if (!currentUser || !isOnline) return null;
-            
-            try {
-                updateCloudStatus(true, 'syncing');
-                
-                const targetDate = date || appData.currentDate;
-                const dateKey = formatDateForStorage(targetDate);
-                const userId = currentUser.uid;
-                
-                const docRef = firestore.collection('dailyReports')
-                    .doc(`${userId}_${dateKey}`);
-                
-                const doc = await docRef.get();
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    
-                    // Update local storage
-                    const localKey = `report_data_${dateKey}`;
-                    localStorage.setItem(localKey, JSON.stringify(data));
-                    
-                    // Update UI if loading for current date
-                    if (!date) {
-                        updateUIFromCloudData(data);
-                    }
-                    
-                    updateSyncStatus();
-                    return data;
-                }
-                
-                return null;
-                
-            } catch (error) {
-                console.error('Cloud load error:', error);
-                return null;
-            } finally {
-                updateCloudStatus(isOnline);
-            }
-        }
-        
-        async function saveReportsToCloud() {
-            if (!currentUser || !isOnline) return;
-            
-            try {
-                const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
-                const userId = currentUser.uid;
-                const deviceId = localStorage.getItem('deviceId') || 'unknown';
-                
-                await firestore.collection('userReports')
-                    .doc(userId)
-                    .set({
-                        reports: savedReports,
-                        count: savedReports.length,
-                        lastSync: firebase.firestore.FieldValue.serverTimestamp(),
-                        deviceId: deviceId,
-                        deviceName: localStorage.getItem('deviceName') || navigator.userAgent.substring(0, 50)
-                    }, { merge: true });
-                
-                showToast('Reports synced to cloud');
-                updateCloudStats();
-                
-            } catch (error) {
-                console.error('Reports sync error:', error);
-            }
-        }
-        
-        async function loadReportsFromCloud() {
-            if (!currentUser || !isOnline) return;
-            
-            try {
-                const userId = currentUser.uid;
-                const docRef = firestore.collection('userReports').doc(userId);
-                const doc = await docRef.get();
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.reports) {
-                        localStorage.setItem('savedReports', JSON.stringify(data.reports));
-                        loadSavedReports();
-                        showToast('Reports loaded from cloud');
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Reports load error:', error);
-            }
-        }
-        
-        // ==================== SYNC FUNCTIONS ====================
-        async function syncNow() {
-            if (!appData.cloudSettings.useCloud) {
-                showToast('Cloud sync not enabled. Configure Firebase first.', 'error');
-                return;
-            }
-            
-            if (!currentUser) {
-                showToast('Please login to use cloud sync', 'error');
-                return;
-            }
-            
-            if (!isOnline) {
-                showToast('No internet connection', 'error');
-                return;
-            }
-            
-            showLoading('Syncing with cloud...');
-            
-            try {
-                // Save current data to cloud
-                await saveToCloud();
-                
-                // Save reports to cloud
-                await saveReportsToCloud();
-                
-                // Update cloud stats
-                await updateCloudStats();
-                
-                showToast('Sync completed successfully');
-                
-            } catch (error) {
-                console.error('Sync error:', error);
-                showToast('Sync failed: ' + error.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        async function syncLocalToCloud() {
-            if (!currentUser || !isOnline) {
-                showToast('Cannot sync: Check internet and login', 'error');
-                return;
-            }
-            
-            if (!confirm('This will overwrite cloud data with your local data. Continue?')) {
-                return;
-            }
-            
-            showLoading('Uploading all data to cloud...');
-            
-            try {
-                // Upload all daily reports
-                const savedDates = JSON.parse(localStorage.getItem('saved_dates') || '[]');
-                let uploaded = 0;
-                
-                for (const dateStr of savedDates) {
-                    const data = localStorage.getItem(`report_data_${dateStr}`);
-                    if (data) {
-                        const cloudData = JSON.parse(data);
-                        const userId = currentUser.uid;
-                        const deviceId = localStorage.getItem('deviceId') || 'unknown';
-                        
-                        await firestore.collection('dailyReports')
-                            .doc(`${userId}_${dateStr}`)
-                            .set({
-                                ...cloudData,
-                                userId: userId,
-                                deviceId: deviceId,
-                                lastModified: firebase.firestore.FieldValue.serverTimestamp(),
-                                source: 'local_upload'
-                            }, { merge: true });
-                        
-                        uploaded++;
-                    }
-                }
-                
-                // Upload saved reports
-                await saveReportsToCloud();
-                
-                showToast(`Uploaded ${uploaded} daily reports to cloud`);
-                
-            } catch (error) {
-                showToast('Upload failed: ' + error.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        async function syncCloudToLocal() {
-            if (!currentUser || !isOnline) {
-                showToast('Cannot sync: Check internet and login', 'error');
-                return;
-            }
-            
-            if (!confirm('This will overwrite local data with cloud data. Continue?')) {
-                return;
-            }
-            
-            showLoading('Downloading all data from cloud...');
-            
-            try {
-                const userId = currentUser.uid;
-                
-                // Get all user's daily reports from cloud
-                const snapshot = await firestore.collection('dailyReports')
-                    .where('userId', '==', userId)
-                    .get();
-                
-                let downloaded = 0;
-                const savedDates = [];
-                
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const dateKey = doc.id.replace(`${userId}_`, '');
-                    
-                    // Save to local storage
-                    localStorage.setItem(`report_data_${dateKey}`, JSON.stringify(data));
-                    savedDates.push(dateKey);
-                    
-                    downloaded++;
-                });
-                
-                // Update saved dates list
-                localStorage.setItem('saved_dates', JSON.stringify(savedDates));
-                
-                // Download saved reports
-                await loadReportsFromCloud();
-                
-                // Load current date data
-                loadDataForCurrentDate();
-                
-                showToast(`Downloaded ${downloaded} daily reports from cloud`);
-                
-            } catch (error) {
-                showToast('Download failed: ' + error.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // ==================== AUTO SYNC ====================
-        function startAutoSync() {
-            if (!appData.cloudSettings.autoSync || !autoSyncEnabled) return;
-            
-            stopAutoSync(); // Clear any existing interval
-            
-            const frequency = appData.cloudSettings.syncFrequency * 60 * 1000;
-            syncInterval = setInterval(async () => {
-                if (isOnline && currentUser) {
-                    console.log('Auto-syncing...');
-                    await saveToCloud();
-                }
-            }, frequency);
-            
-            console.log('Auto-sync started');
-            document.getElementById('autoSyncStatus').textContent = 'On';
-        }
-        
-        function stopAutoSync() {
-            if (syncInterval) {
-                clearInterval(syncInterval);
-                syncInterval = null;
-            }
-            document.getElementById('autoSyncStatus').textContent = 'Off';
-        }
-        
-        // ==================== UI UPDATE FUNCTIONS ====================
-        function updateUIFromCloudData(data) {
-            if (data.progress) {
-                appData.progress = data.progress;
-                document.getElementById('physicalActual').value = data.progress.physical.actual || 0;
-                document.getElementById('physicalScheduled').value = data.progress.physical.scheduled || 0;
-                document.getElementById('financialActual').value = data.progress.financial.actual || 0;
-                document.getElementById('financialScheduled').value = data.progress.financial.scheduled || 0;
-                updatePhysicalProgress();
-                updateFinancialProgress();
-            }
-            if (data.manpower) {
-                appData.manpower = data.manpower;
-                initManpowerGrid();
-            }
-            if (data.weatherData) {
-                rebuildWeatherContainer(data.weatherData);
-            }
-            if (data.materials) populateList('materialList', data.materials);
-            if (data.machinery) populateList('machineryList', data.machinery);
-            if (data.activities) populateList('activityList', data.activities);
-            if (data.works) populateList('worksList', data.works);
-            if (data.remarks) populateList('remarksList', data.remarks);
-        }
-        
-        function updateCloudStatus(online, status = null) {
-            isOnline = online;
-            const statusDiv = document.getElementById('cloudStatus');
-            const icon = document.getElementById('cloudStatusIcon');
-            const text = document.getElementById('cloudStatusText');
-            
-            if (status === 'syncing') {
-                statusDiv.className = 'cloud-status syncing';
-                icon.textContent = '🔄';
-                text.textContent = 'Syncing...';
-            } else if (online && appData.cloudSettings.useCloud) {
-                statusDiv.className = 'cloud-status online';
-                icon.textContent = '☁️';
-                text.textContent = 'Online';
-            } else {
-                statusDiv.className = 'cloud-status offline';
-                icon.textContent = '⚠️';
-                text.textContent = appData.cloudSettings.useCloud ? 'Offline' : 'Local Only';
-            }
-        }
-        
-        function updateUserInfo(user) {
-            const email = user.email || 'Anonymous User';
-            const avatar = document.getElementById('userAvatar');
-            const emailDisplay = document.getElementById('userEmail');
-            
-            // Set avatar initials
-            const initials = email.charAt(0).toUpperCase();
-            avatar.textContent = initials;
-            
-            // Set email
-            emailDisplay.textContent = email.length > 20 ? email.substring(0, 20) + '...' : email;
-            
-            // Update device info
-            document.getElementById('currentDeviceName').textContent = 
-                localStorage.getItem('deviceName') || navigator.userAgent.substring(0, 30);
-            document.getElementById('deviceConnectionTime').textContent = 
-                new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        
-        function updateSyncStatus() {
-            const lastSync = localStorage.getItem('lastCloudSync');
-            const syncDisplay = document.getElementById('syncStatus');
-            
-            if (lastSync) {
-                const date = new Date(lastSync);
-                const now = new Date();
-                const diffMinutes = Math.floor((now - date) / (1000 * 60));
-                
-                if (diffMinutes < 1) {
-                    syncDisplay.textContent = 'Just now';
-                } else if (diffMinutes < 60) {
-                    syncDisplay.textContent = `${diffMinutes} min ago`;
-                } else {
-                    syncDisplay.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-                
-                // Update last sync time in cloud tab
-                document.getElementById('lastSyncTime').textContent = 
-                    date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } else {
-                syncDisplay.textContent = 'Never synced';
-                document.getElementById('lastSyncTime').textContent = 'Never';
-            }
-        }
-        
-        async function updateCloudStats() {
-            if (!currentUser || !isOnline) return;
-            
-            try {
-                const userId = currentUser.uid;
-                
-                // Get daily reports count
-                const dailySnapshot = await firestore.collection('dailyReports')
-                    .where('userId', '==', userId)
-                    .get();
-                
-                const dailyCount = dailySnapshot.size;
-                
-                // Get saved reports count
-                const reportsDoc = await firestore.collection('userReports')
-                    .doc(userId)
-                    .get();
-                
-                const reportsCount = reportsDoc.exists ? (reportsDoc.data().count || 0) : 0;
-                
-                // Update UI
-                document.getElementById('cloudDailyCount').textContent = dailyCount;
-                document.getElementById('cloudSavedCount').textContent = reportsCount;
-                document.getElementById('cloudStorageUsed').textContent = 
-                    Math.round((dailyCount * 5 + reportsCount * 10) / 1024) + ' KB';
-                
-                document.getElementById('syncStatusText').textContent = isOnline ? 'Connected' : 'Disconnected';
-                
-            } catch (error) {
-                console.error('Stats update error:', error);
-            }
-        }
-        
-        // ==================== NETWORK LISTENER ====================
-        function setupNetworkListener() {
-            // Initial state
-            updateCloudStatus(isOnline);
-            
-            // Listen for changes
-            window.addEventListener('online', () => {
-                isOnline = true;
-                updateCloudStatus(true);
-                showToast('Back online. Auto-syncing...');
-                if (currentUser && appData.cloudSettings.autoSync) {
-                    setTimeout(syncNow, 2000);
-                }
-            });
-            
-            window.addEventListener('offline', () => {
-                isOnline = false;
-                updateCloudStatus(false);
-                showToast('You are offline. Working locally.', 'warning');
-            });
-        }
-        
-        // ==================== SETTINGS MANAGEMENT ====================
-        function loadCloudSettings() {
-            const saved = localStorage.getItem('cloudSettings');
-            if (saved) {
-                const settings = JSON.parse(saved);
-                appData.cloudSettings = { ...appData.cloudSettings, ...settings };
-                
-                if (settings.firebaseConfig) {
-                    document.getElementById('firebaseApiKey').value = settings.firebaseConfig.apiKey || '';
-                    document.getElementById('firebaseAuthDomain').value = settings.firebaseConfig.authDomain || '';
-                    document.getElementById('firebaseProjectId').value = settings.firebaseConfig.projectId || '';
-                    document.getElementById('firebaseStorageBucket').value = settings.firebaseConfig.storageBucket || '';
-                    document.getElementById('firebaseMessagingSenderId').value = settings.firebaseConfig.messagingSenderId || '';
-                    document.getElementById('firebaseAppId').value = settings.firebaseConfig.appId || '';
-                }
-            }
-        }
-        
-        function saveFirebaseConfig() {
-            const config = {
-                apiKey: document.getElementById('firebaseApiKey').value.trim(),
-                authDomain: document.getElementById('firebaseAuthDomain').value.trim(),
-                projectId: document.getElementById('firebaseProjectId').value.trim(),
-                storageBucket: document.getElementById('firebaseStorageBucket').value.trim(),
-                messagingSenderId: document.getElementById('firebaseMessagingSenderId').value.trim(),
-                appId: document.getElementById('firebaseAppId').value.trim()
-            };
-            
-            // Validate config
-            if (!config.apiKey || !config.projectId) {
-                document.getElementById('firebaseConfigError').textContent = 'API Key and Project ID are required';
-                document.getElementById('firebaseConfigError').style.display = 'block';
-                return;
-            }
-            
-            // Save settings
-            appData.cloudSettings.firebaseConfig = config;
-            appData.cloudSettings.useCloud = true;
-            localStorage.setItem('cloudSettings', JSON.stringify(appData.cloudSettings));
-            
-            // Initialize Firebase
-            initializeFirebase();
-            
-            showToast('Firebase configuration saved');
-            closeModal();
-        }
-        
-        // ==================== EXISTING FUNCTIONS (Modified for Cloud) ====================
+        // ==================== DATE MANAGEMENT ====================
         function formatDateForStorage(date) {
             const d = new Date(date);
             const year = d.getFullYear();
@@ -2988,80 +1811,46 @@
                 machinery: getListValues('machineryList'),
                 activities: getListValues('activityList'),
                 works: getListValues('worksList'),
-                remarks: getListValues('remarksList'),
-                lastModified: new Date().toISOString()
+                remarks: getListValues('remarksList')
             };
-            
-            // Save to local storage
             localStorage.setItem(dateKey, JSON.stringify(data));
-            
-            // Save to cloud if enabled and user is logged in
-            if (appData.cloudSettings.useCloud && currentUser && isOnline) {
-                saveToCloud();
-            }
-            
-            // Update saved dates
             const savedDates = JSON.parse(localStorage.getItem('saved_dates') || '[]');
-            if (!savedDates.includes(dateKey)) {
-                savedDates.push(dateKey);
+            const dateStr = formatDateForStorage(appData.currentDate);
+            if (!savedDates.includes(dateStr)) {
+                savedDates.push(dateStr);
                 localStorage.setItem('saved_dates', JSON.stringify(savedDates));
             }
         }
         
-        // ==================== UTILITY FUNCTIONS ====================
-        function showLoading(message = 'Loading...') {
-            const loading = document.getElementById('loadingOverlay');
-            const messageDiv = document.getElementById('loadingMessage');
-            messageDiv.textContent = message;
-            loading.style.display = 'flex';
+        function setSelectedDate() {
+            const datePicker = document.getElementById('datePicker');
+            if (datePicker.value) {
+                saveDataForCurrentDate();
+                appData.currentDate = new Date(datePicker.value);
+                updateDateDisplay();
+                loadDataForCurrentDate();
+                document.getElementById('reportCard').style.display = 'none';
+                showToast('Date changed to ' + formatDate(appData.currentDate));
+                closeModal();
+            }
         }
         
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
+        function useToday() {
+            saveDataForCurrentDate();
+            appData.currentDate = new Date();
+            updateDateDisplay();
+            loadDataForCurrentDate();
+            document.getElementById('reportCard').style.display = 'none';
+            showToast('Date set to today');
         }
         
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast ' + (type === 'error' ? 'error' : type === 'warning' ? 'warning' : '');
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function updateDateDisplay() {
+            const date = appData.currentDate;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = date.toLocaleDateString('en-US', options);
         }
         
-        function showFirebaseAuth() {
-            document.getElementById('localAuth').style.display = 'none';
-            document.getElementById('firebaseAuth').style.display = 'block';
-            document.getElementById('emailInput').focus();
-        }
-        
-        function showLocalAuth() {
-            document.getElementById('firebaseAuth').style.display = 'none';
-            document.getElementById('localAuth').style.display = 'block';
-            document.getElementById('localPasswordInput').focus();
-        }
-        
-        function showSignup() {
-            closeModal();
-            openModal('signupModal');
-            document.getElementById('signupEmail').focus();
-        }
-        
-        function showFirebaseConfig() {
-            openModal('firebaseConfigModal');
-        }
-        
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-        
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
-        }
-        
-        // ==================== EXISTING REPORT FUNCTIONS ====================
-        // All your existing report functions remain the same, just need to be included
-        // For brevity, I'll include the essential ones. The rest should be copied from your original code.
-        
+        // ==================== PROGRESS MONITORING ====================
         function updatePhysicalProgress() {
             const actual = parseFloat(document.getElementById('physicalActual').value) || 0;
             const scheduled = parseFloat(document.getElementById('physicalScheduled').value) || 0;
@@ -3096,6 +1885,7 @@
             saveDataForCurrentDate();
         }
         
+        // ==================== WEATHER FUNCTIONS ====================
         function getWeatherData() {
             const weatherData = [];
             const container = document.getElementById('weatherContainer');
@@ -3190,6 +1980,7 @@
             saveDataForCurrentDate();
         }
         
+        // ==================== MANPOWER FUNCTIONS ====================
         function initManpowerGrid() {
             const grid = document.getElementById('manpowerGrid');
             grid.innerHTML = '';
@@ -3220,6 +2011,7 @@
             }
         }
         
+        // ==================== LIST MANAGEMENT ====================
         function addListItem(containerId) {
             const container = document.getElementById(containerId);
             const div = document.createElement('div');
@@ -3262,6 +2054,7 @@
             });
         }
         
+        // ==================== FORM RESET & CLEAR ====================
         function resetFormToDefaults() {
             appData.progress = { physical: { actual: 0, scheduled: 0 }, financial: { actual: 0, scheduled: 0 } };
             appData.manpower.forEach(p => { p.value = p.id === 'sg' ? 1 : 0; });
@@ -3296,6 +2089,7 @@
             closeModal();
         }
         
+        // ==================== DAILY REPORT GENERATION ====================
         function generateReport() {
             try {
                 const date = appData.currentDate;
@@ -3390,12 +2184,7 @@
             }
         }
         
-        // ==================== ADDITIONAL FUNCTIONS FROM ORIGINAL ====================
-        // Note: You'll need to copy all the remaining functions from your original code here
-        // including: populateYearSelect, generateMonthlyReport, exportToPDF, exportMonthlyToPDF,
-        // loadSavedReports, saveDailyReport, etc.
-        // For brevity, I'm showing the structure. You should copy all your original functions.
-        
+        // ==================== MONTHLY REPORT FUNCTIONS ====================
         function populateYearSelect() {
             const yearSelect = document.getElementById('yearSelect');
             const currentYear = new Date().getFullYear();
@@ -3409,8 +2198,924 @@
             }
         }
         
-        // ... (Copy all your remaining functions from the original code here)
-        // This includes all the report generation, PDF export, saved reports management, etc.
+        function generateMonthlyReport() {
+            try {
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+                const dailyDataKeys = JSON.parse(localStorage.getItem('saved_dates') || '[]');
+                
+                const monthlyData = [];
+                dailyDataKeys.forEach(dateStr => {
+                    const dateParts = dateStr.split('-');
+                    if (parseInt(dateParts[0]) === year && parseInt(dateParts[1]) === month) {
+                        const data = localStorage.getItem(`report_data_${dateStr}`);
+                        if (data) monthlyData.push({ date: dateStr, data: JSON.parse(data) });
+                    }
+                });
+                
+                if (monthlyData.length === 0) {
+                    showToast('No data found for selected month', 'error');
+                    return;
+                }
+                
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                let weatherStats = {};
+                let totalPhysicalActual = 0, totalPhysicalScheduled = 0;
+                let totalFinancialActual = 0, totalFinancialScheduled = 0;
+                let totalManpower = 0, totalDaysWithActivity = 0;
+                let activitySummary = {};
+                
+                monthlyData.forEach(day => {
+                    const data = day.data;
+                    if (data.weatherData) {
+                        data.weatherData.forEach(weather => {
+                            weatherStats[weather.condition] = (weatherStats[weather.condition] || 0) + 1;
+                        });
+                    }
+                    if (data.progress) {
+                        totalPhysicalActual += data.progress.physical.actual || 0;
+                        totalPhysicalScheduled += data.progress.physical.scheduled || 0;
+                        totalFinancialActual += data.progress.financial.actual || 0;
+                        totalFinancialScheduled += data.progress.financial.scheduled || 0;
+                    }
+                    if (data.manpower) {
+                        totalManpower += data.manpower.reduce((sum, p) => sum + p.value, 0);
+                    }
+                    if (data.activities && data.activities[0] !== 'No Activity') {
+                        totalDaysWithActivity++;
+                        data.activities.forEach(activity => {
+                            if (activity !== 'No Activity') activitySummary[activity] = (activitySummary[activity] || 0) + 1;
+                        });
+                    }
+                });
+                
+                const avgPhysicalActual = totalPhysicalActual / monthlyData.length;
+                const avgPhysicalScheduled = totalPhysicalScheduled / monthlyData.length;
+                const avgFinancialActual = totalFinancialActual / monthlyData.length;
+                const avgFinancialScheduled = totalFinancialScheduled / monthlyData.length;
+                const avgDailyManpower = totalManpower / monthlyData.length;
+                
+                let report = `MONTHLY CONSTRUCTION REPORT\n`;
+                report += `========================================\n\n`;
+                report += `Project: GERAI BERSEPADU BELURU\n`;
+                report += `Location: LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI\n`;
+                report += `Period: ${monthNames[month - 1]} ${year}\n`;
+                report += `Total Days: ${monthlyData.length}\n`;
+                report += `Days with Activities: ${totalDaysWithActivity}\n`;
+                report += `Days without Activities: ${monthlyData.length - totalDaysWithActivity}\n\n`;
+                
+                report += `========================================\n`;
+                report += `WEATHER CONDITIONS SUMMARY\n`;
+                report += `========================================\n\n`;
+                
+                if (Object.keys(weatherStats).length > 0) {
+                    let predominantWeather = 'None', maxDays = 0;
+                    Object.entries(weatherStats).forEach(([condition, days]) => {
+                        if (days > maxDays) { maxDays = days; predominantWeather = condition; }
+                    });
+                    report += `Predominant Weather: ${predominantWeather} (${maxDays} days)\n\n`;
+                    report += `Weather Distribution:\n`;
+                    Object.entries(weatherStats).forEach(([condition, days]) => {
+                        const percentage = ((days / monthlyData.length) * 100).toFixed(1);
+                        report += `• ${condition}: ${days} days (${percentage}%)\n`;
+                    });
+                } else {
+                    report += `No weather data available\n`;
+                }
+                
+                report += `\n========================================\n`;
+                report += `PROGRESS SUMMARY\n`;
+                report += `========================================\n\n`;
+                report += `Physical Progress (Average):\n`;
+                report += `• Actual: ${avgPhysicalActual.toFixed(1)}%\n`;
+                report += `• Scheduled: ${avgPhysicalScheduled.toFixed(1)}%\n`;
+                report += `• Variance: ${(avgPhysicalActual - avgPhysicalScheduled).toFixed(1)}%\n\n`;
+                
+                report += `Financial Progress (Average):\n`;
+                report += `• Actual: ${avgFinancialActual.toFixed(1)}%\n`;
+                report += `• Scheduled: ${avgFinancialScheduled.toFixed(1)}%\n`;
+                report += `• Variance: ${(avgFinancialActual - avgFinancialScheduled).toFixed(1)}%\n\n`;
+                
+                report += `========================================\n`;
+                report += `WORKFORCE SUMMARY\n`;
+                report += `========================================\n\n`;
+                report += `Average Daily Manpower: ${avgDailyManpower.toFixed(1)} workers\n`;
+                report += `Total Manpower Days: ${totalManpower}\n`;
+                report += `Productive Days: ${totalDaysWithActivity}/${monthlyData.length} (${((totalDaysWithActivity / monthlyData.length) * 100).toFixed(1)}%)\n\n`;
+                
+                if (Object.keys(activitySummary).length > 0) {
+                    report += `========================================\n`;
+                    report += `ACTIVITY SUMMARY\n`;
+                    report += `========================================\n\n`;
+                    const sortedActivities = Object.entries(activitySummary)
+                        .sort((a, b) => b[1] - a[1]).slice(0, 10);
+                    sortedActivities.forEach(([activity, count], index) => {
+                        const percentage = ((count / totalDaysWithActivity) * 100).toFixed(1);
+                        report += `${index + 1}. ${activity}: ${count} days (${percentage}%)\n`;
+                    });
+                    report += `\n`;
+                }
+                
+                report += `========================================\n`;
+                report += `DAILY REPORTS OVERVIEW\n`;
+                report += `========================================\n\n`;
+                monthlyData.forEach((day, index) => {
+                    const date = new Date(day.date);
+                    const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const formattedDate = formatDate(date);
+                    const mainActivity = day.data.activities && day.data.activities[0] !== 'No Activity' 
+                        ? day.data.activities[0] : 'No activity';
+                    const dayWeather = day.data.weatherData && day.data.weatherData.length > 0
+                        ? day.data.weatherData[0].condition : 'No weather data';
+                    const dayManpower = day.data.manpower 
+                        ? day.data.manpower.reduce((sum, p) => sum + p.value, 0) : 0;
+                    
+                    report += `Day ${index + 1}: ${formattedDate} (${dayOfWeek})\n`;
+                    report += `Activity: ${mainActivity.substring(0, 40)}${mainActivity.length > 40 ? '...' : ''}\n`;
+                    report += `Weather: ${dayWeather}\n`;
+                    report += `Manpower: ${dayManpower} workers\n`;
+                    report += `---\n`;
+                });
+                
+                report += `\n========================================\n`;
+                report += `KEY FINDINGS & INSIGHTS\n`;
+                report += `========================================\n\n`;
+                const insights = [];
+                if (avgPhysicalActual < avgPhysicalScheduled) {
+                    const variance = avgPhysicalScheduled - avgPhysicalActual;
+                    insights.push(`• Physical progress behind schedule by ${variance.toFixed(1)}%`);
+                } else if (avgPhysicalActual > avgPhysicalScheduled) {
+                    const variance = avgPhysicalActual - avgPhysicalScheduled;
+                    insights.push(`• Physical progress ahead of schedule by ${variance.toFixed(1)}%`);
+                }
+                if (avgFinancialActual < avgFinancialScheduled) {
+                    const variance = avgFinancialScheduled - avgFinancialActual;
+                    insights.push(`• Financial progress behind schedule by ${variance.toFixed(1)}%`);
+                } else if (avgFinancialActual > avgFinancialScheduled) {
+                    const variance = avgFinancialActual - avgFinancialScheduled;
+                    insights.push(`• Financial progress ahead of schedule by ${variance.toFixed(1)}%`);
+                }
+                if (totalDaysWithActivity < monthlyData.length * 0.7) {
+                    insights.push(`• Low productivity: Only ${totalDaysWithActivity}/${monthlyData.length} days had activities`);
+                }
+                const rainyDays = Object.entries(weatherStats).reduce((sum, [condition, days]) => {
+                    if (condition.includes('Rain') || condition.includes('Storm')) return sum + days;
+                    return sum;
+                }, 0);
+                if (rainyDays > 0) insights.push(`• ${rainyDays} rainy/stormy days affected work`);
+                if (insights.length > 0) insights.forEach(insight => report += `${insight}\n`);
+                else report += `• All metrics within acceptable ranges\n`;
+                
+                report += `\n========================================\n`;
+                report += `RECOMMENDATIONS\n`;
+                report += `========================================\n\n`;
+                const recommendations = [];
+                if (avgPhysicalActual < avgPhysicalScheduled) {
+                    recommendations.push(`1. Increase workforce or extend working hours`);
+                    recommendations.push(`2. Review construction sequencing for efficiency`);
+                }
+                if (rainyDays > monthlyData.length * 0.2) {
+                    recommendations.push(`3. Implement better weather contingency plans`);
+                    recommendations.push(`4. Schedule critical outdoor work during forecasted dry periods`);
+                }
+                if (totalDaysWithActivity < monthlyData.length * 0.8) {
+                    recommendations.push(`5. Improve planning to reduce non-productive days`);
+                }
+                if (recommendations.length > 0) recommendations.forEach(rec => report += `${rec}\n`);
+                else { report += `1. Maintain current operations and monitoring\n`; report += `2. Continue regular progress tracking\n`; }
+                
+                report += `\n========================================\n`;
+                report += `REPORT SUMMARY\n`;
+                report += `========================================\n\n`;
+                let performanceRating = 'Good';
+                if (avgPhysicalActual >= avgPhysicalScheduled && totalDaysWithActivity >= monthlyData.length * 0.8) performanceRating = 'Excellent';
+                else if (avgPhysicalActual < avgPhysicalScheduled * 0.9 || totalDaysWithActivity < monthlyData.length * 0.6) performanceRating = 'Needs Improvement';
+                report += `Overall Performance: ${performanceRating}\n`;
+                report += `Progress Status: ${avgPhysicalActual >= avgPhysicalScheduled ? 'On or Ahead of Schedule' : 'Behind Schedule'}\n`;
+                report += `Weather Impact: ${rainyDays > monthlyData.length * 0.3 ? 'Significant' : rainyDays > 0 ? 'Moderate' : 'Minimal'}\n`;
+                report += `\nReport Generated: ${new Date().toLocaleString()}`;
+                
+                currentReportText = report;
+                appData.currentReportType = 'monthly';
+                document.getElementById('monthlyReportOutput').textContent = report;
+                document.getElementById('monthlyReportCard').style.display = 'block';
+                updateMonthlyStatsDisplay(monthlyData, month, year, { weatherStats, avgPhysicalActual, avgPhysicalScheduled, avgFinancialActual, avgFinancialScheduled, totalDaysWithActivity, totalManpower, totalDays: monthlyData.length, rainyDays });
+                showToast(`Monthly report generated for ${monthNames[month - 1]} ${year}`);
+            } catch (error) {
+                console.error('Error generating monthly report:', error);
+                showToast('Error generating monthly report: ' + error.message, 'error');
+            }
+        }
+        
+        function updateMonthlyStatsDisplay(monthlyData, month, year, stats) {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            let statsHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">📅 Month</div>
+                        <div style="font-weight: bold; color: #27ae60; font-size: 1.2rem;">${monthNames[month - 1]}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${year}</div>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">📊 Total Days</div>
+                        <div style="font-weight: bold; color: #2196f3; font-size: 1.2rem;">${stats.totalDays}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${stats.totalDaysWithActivity} with activity</div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">📈 Physical Progress</div>
+                        <div style="font-weight: bold; color: #ff9800; font-size: 1.2rem;">${stats.avgPhysicalActual.toFixed(1)}%</div>
+                        <div style="font-size: 0.8rem; color: #666;">Scheduled: ${stats.avgPhysicalScheduled.toFixed(1)}%</div>
+                    </div>
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">💰 Financial Progress</div>
+                        <div style="font-weight: bold; color: #9c27b0; font-size: 1.2rem;">${stats.avgFinancialActual.toFixed(1)}%</div>
+                        <div style="font-size: 0.8rem; color: #666;">Scheduled: ${stats.avgFinancialScheduled.toFixed(1)}%</div>
+                    </div>
+                </div>`;
+            if (Object.keys(stats.weatherStats).length > 0) {
+                statsHTML += `<div style="background: #e3f2fd; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: #1565c0; margin-bottom: 15px;">🌤️ Weather Distribution</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">`;
+                Object.entries(stats.weatherStats).forEach(([condition, count]) => {
+                    const percentage = ((count / stats.totalDays) * 100).toFixed(1);
+                    statsHTML += `<div style="background: white; padding: 10px; border-radius: 8px; text-align: center;">
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">${condition}</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #1565c0;">${count}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${percentage}%</div>
+                    </div>`;
+                });
+                statsHTML += `</div></div>`;
+            }
+            document.getElementById('monthlyStats').innerHTML = statsHTML;
+            document.getElementById('monthlyStatsCard').style.display = 'block';
+        }
+        
+        function saveMonthlyReport() {
+            if (!currentReportText || appData.currentReportType !== 'monthly') {
+                showToast('Please generate a monthly report first', 'error');
+                return;
+            }
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const month = parseInt(document.getElementById('monthSelect').value);
+            const year = parseInt(document.getElementById('yearSelect').value);
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            savedReports.push({
+                date: new Date(year, month - 1, 1).toISOString(),
+                report: currentReportText,
+                type: 'monthly',
+                month: month,
+                year: year,
+                title: `Monthly Report - ${monthNames[month - 1]} ${year}`
+            });
+            localStorage.setItem('savedReports', JSON.stringify(savedReports));
+            showToast('Monthly report saved successfully!');
+            loadSavedReports();
+        }
+        
+        // ==================== PDF EXPORT FUNCTIONS ====================
+        function exportToPDF() {
+            try {
+                if (!currentReportText || currentReportText.includes('Report will appear here')) {
+                    showToast('Please generate a report first', 'error');
+                    return;
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                let yPos = margin;
+                const lineHeight = 4.5;
+                const smallLineHeight = 4;
+                
+                doc.setFont('courier', 'normal');
+                doc.setFontSize(9);
+                
+                const reportLines = currentReportText.split('\n');
+                const contentWidth = pageWidth - (2 * margin);
+                let signatureAdded = false;
+                
+                for (let i = 0; i < reportLines.length; i++) {
+                    const line = reportLines[i];
+                    
+                    if (yPos > pageHeight - 50 && !signatureAdded) {
+                        if (yPos > pageHeight - 80) {
+                            showToast('Daily report too long for one page. Consider shortening.', 'error');
+                            return;
+                        }
+                    }
+                    
+                    if (line.includes('Generated:') && line.includes('--- END OF REPORT ---')) continue;
+                    
+                    if (line.match(/^[A-Z][A-Z\s]+:$/) || line.match(/^[A-Z][A-Z\s\&]+:$/)) {
+                        doc.setFont('courier', 'bold');
+                        doc.setFontSize(10);
+                        doc.text(line, margin, yPos);
+                        yPos += lineHeight + 1;
+                        doc.setFont('courier', 'normal');
+                        doc.setFontSize(9);
+                        continue;
+                    }
+                    
+                    if (line.includes('Project Title:')) {
+                        const titleLines = doc.splitTextToSize(line, contentWidth);
+                        titleLines.forEach(titleLine => {
+                            doc.text(titleLine, margin, yPos);
+                            yPos += lineHeight;
+                        });
+                        yPos += 3;
+                        continue;
+                    }
+                    
+                    if (line === 'DAILY CONSTRUCTION REPORT') {
+                        doc.setFont('courier', 'bold');
+                        doc.setFontSize(11);
+                        doc.text(line, margin, yPos);
+                        yPos += lineHeight + 2;
+                        doc.setFont('courier', 'normal');
+                        doc.setFontSize(9);
+                        continue;
+                    }
+                    
+                    if (line.includes('--- END OF REPORT ---')) {
+                        doc.setLineWidth(0.5);
+                        doc.line(margin, yPos - 2, pageWidth - margin, yPos - 2);
+                        doc.text(line, pageWidth / 2, yPos, { align: 'center' });
+                        yPos += lineHeight + 5;
+                        addSignatureSection(doc, yPos, pageWidth, pageHeight, margin);
+                        signatureAdded = true;
+                        break;
+                    }
+                    
+                    if (line.trim() !== '') {
+                        const textLines = doc.splitTextToSize(line, contentWidth);
+                        textLines.forEach(textLine => {
+                            doc.text(textLine, margin, yPos);
+                            yPos += smallLineHeight;
+                        });
+                    } else {
+                        yPos += smallLineHeight / 2;
+                    }
+                }
+                
+                if (!signatureAdded) {
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, yPos, pageWidth - margin, yPos);
+                    yPos += lineHeight;
+                    doc.setFont('courier', 'bold');
+                    doc.text('--- END OF REPORT ---', pageWidth / 2, yPos, { align: 'center' });
+                    yPos += lineHeight + 5;
+                    addSignatureSection(doc, yPos, pageWidth, pageHeight, margin);
+                }
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`PDF Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                
+                const date = appData.currentDate;
+                const dateStr = formatDateForFile(date);
+                doc.save(`Daily_Report_${dateStr}.pdf`);
+                showToast('Daily PDF exported (exact text format, 1 A4 page)');
+            } catch (error) {
+                console.error('Daily PDF export error:', error);
+                showToast('Error exporting PDF: ' + error.message, 'error');
+            }
+        }
+        
+        function exportMonthlyToPDF() {
+            try {
+                if (!currentReportText || appData.currentReportType !== 'monthly') {
+                    showToast('Please generate a monthly report first', 'error');
+                    return;
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                const lineHeight = 4.5;
+                const smallLineHeight = 4;
+                const contentWidth = pageWidth - (2 * margin);
+                
+                const month = parseInt(document.getElementById('monthSelect').value);
+                const year = parseInt(document.getElementById('yearSelect').value);
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                let currentPage = 1;
+                let yPos = margin;
+                let signatureAdded = false;
+                
+                function addPageHeader() {
+                    const currentY = yPos;
+                    yPos = margin;
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('MONTHLY CONSTRUCTION REPORT', pageWidth / 2, yPos, { align: 'center' });
+                    yPos += 6;
+                    doc.setFontSize(12);
+                    doc.text('GERAI BERSEPADU BELURU', pageWidth / 2, yPos, { align: 'center' });
+                    yPos += 5;
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('LOT 109, BELURU TOWN DISTRICT, BELURU, BAKONG, MIRI', pageWidth / 2, yPos, { align: 'center' });
+                    yPos += 8;
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`Period: ${monthNames[month - 1]} ${year}`, margin, yPos);
+                    doc.text(`Page ${currentPage}`, pageWidth - margin, yPos, { align: 'right' });
+                    yPos += 8;
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, yPos, pageWidth - margin, yPos);
+                    yPos += 10;
+                    return currentY;
+                }
+                
+                addPageHeader();
+                const reportLines = currentReportText.split('\n');
+                
+                for (let i = 0; i < reportLines.length; i++) {
+                    const line = reportLines[i];
+                    
+                    if (yPos > pageHeight - 40) {
+                        doc.addPage();
+                        currentPage++;
+                        yPos = addPageHeader();
+                    }
+                    
+                    if (line.includes('Report Generated:') && i === reportLines.length - 1) continue;
+                    
+                    if (line.includes('========================================')) {
+                        if (i + 1 < reportLines.length && reportLines[i + 1].trim() !== '') {
+                            doc.setLineWidth(0.5);
+                            doc.line(margin, yPos, pageWidth - margin, yPos);
+                            yPos += 3;
+                            const nextLine = reportLines[i + 1];
+                            doc.setFont('courier', 'bold');
+                            doc.setFontSize(11);
+                            doc.text(nextLine, margin, yPos);
+                            yPos += lineHeight + 2;
+                            i++;
+                            continue;
+                        }
+                    }
+                    
+                    if (line === 'MONTHLY CONSTRUCTION REPORT' || 
+                        line.includes('Project: GERAI BERSEPADU BELURU') || 
+                        line.includes('Location: LOT 109') || line.includes('Period:')) continue;
+                    
+                    if (line.match(/^[A-Z][A-Z\s]+:$/) || line.match(/^[A-Z][A-Z\s\&]+:$/) ||
+                        line === 'DAILY REPORTS OVERVIEW:' || line === 'KEY FINDINGS & INSIGHTS:' ||
+                        line === 'RECOMMENDATIONS:' || line === 'REPORT SUMMARY:') {
+                        doc.setFont('courier', 'bold');
+                        doc.setFontSize(10);
+                        const sectionLines = doc.splitTextToSize(line, contentWidth);
+                        sectionLines.forEach(sectionLine => {
+                            doc.text(sectionLine, margin, yPos);
+                            yPos += lineHeight;
+                        });
+                        yPos += 1;
+                        doc.setFont('courier', 'normal');
+                        doc.setFontSize(9);
+                        continue;
+                    }
+                    
+                    if (line.match(/^\s*•/) || line.match(/^\s*\d+\./)) {
+                        const bulletLines = doc.splitTextToSize(line, contentWidth - 5);
+                        bulletLines.forEach((bulletLine, idx) => {
+                            if (idx === 0) doc.text(bulletLine, margin, yPos);
+                            else doc.text(bulletLine, margin + 5, yPos);
+                            yPos += smallLineHeight;
+                        });
+                        continue;
+                    }
+                    
+                    if (line.match(/^Day \d+:/)) {
+                        doc.setFont('courier', 'bold');
+                        doc.setFontSize(9);
+                        doc.text(line, margin, yPos);
+                        yPos += smallLineHeight;
+                        doc.setFont('courier', 'normal');
+                        continue;
+                    }
+                    
+                    if (line.trim() !== '') {
+                        const textLines = doc.splitTextToSize(line, contentWidth);
+                        textLines.forEach(textLine => {
+                            doc.text(textLine, margin, yPos);
+                            yPos += smallLineHeight;
+                        });
+                    } else yPos += smallLineHeight / 2;
+                }
+                
+                if (yPos > pageHeight - 80) {
+                    doc.addPage();
+                    currentPage++;
+                    yPos = addPageHeader();
+                }
+                
+                yPos += 5;
+                doc.setLineWidth(0.5);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 8;
+                doc.setFontSize(9);
+                doc.setFont('courier', 'italic');
+                doc.text(`Report Generated: ${new Date().toLocaleString()}`, margin, yPos);
+                yPos += lineHeight + 5;
+                addSignatureSection(doc, yPos, pageWidth, pageHeight, margin);
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`Page ${currentPage} of ${currentPage}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                
+                const safeMonthName = monthNames[month - 1].replace(/\s+/g, '_');
+                doc.save(`Monthly_Report_${safeMonthName}_${year}.pdf`);
+                showToast(`Monthly PDF exported (${currentPage} pages, exact text format)`);
+            } catch (error) {
+                console.error('Monthly PDF export error:', error);
+                showToast('Error exporting monthly PDF: ' + error.message, 'error');
+            }
+        }
+        
+        function addSignatureSection(doc, yPos, pageWidth, pageHeight, margin) {
+            const signatureY = Math.max(yPos, pageHeight - 60);
+            doc.setLineWidth(0.3);
+            doc.line(margin, signatureY + 15, margin + 60, signatureY + 15);
+            doc.line(pageWidth - margin - 60, signatureY + 15, pageWidth - margin, signatureY + 15);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Prepared By:', margin, signatureY);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appData.pdfSettings.preparedByName || 'Site Supervisor', margin, signatureY + 5);
+            doc.text(appData.pdfSettings.preparedByDesignation || 'Site Supervisor', margin, signatureY + 10);
+            doc.text('Signature: ________________', margin, signatureY + 18);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Witnessed By:', pageWidth - margin - 60, signatureY);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(appData.pdfSettings.witnessedByName || 'Project Manager', pageWidth - margin - 60, signatureY + 5);
+            doc.text(appData.pdfSettings.witnessedByDesignation || 'Project Manager', pageWidth - margin - 60, signatureY + 10);
+            doc.text('Signature: ________________', pageWidth - margin - 60, signatureY + 18);
+            if (appData.pdfSettings.companyStamp && appData.pdfSettings.companyStamp.trim() !== '') {
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`Company Stamp: ${appData.pdfSettings.companyStamp}`, pageWidth / 2, signatureY + 25, { align: 'center' });
+            }
+        }
+        
+        // ==================== SAVED REPORTS MANAGEMENT ====================
+        function loadSavedReports() {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            const grid = document.getElementById('savedReportsGrid');
+            if (savedReports.length === 0) {
+                document.getElementById('noReportsMessage').style.display = 'block';
+                grid.innerHTML = '';
+                return;
+            }
+            document.getElementById('noReportsMessage').style.display = 'none';
+            grid.innerHTML = '';
+            savedReports.sort((a, b) => new Date(b.date) - new Date(a.date));
+            savedReports.forEach((report, index) => {
+                const reportDate = new Date(report.date);
+                const formattedDate = formatDate(reportDate);
+                const preview = report.report.substring(0, 150) + (report.report.length > 150 ? '...' : '');
+                const isMonthly = report.type === 'monthly';
+                const card = document.createElement('div');
+                card.className = 'saved-report-card';
+                card.innerHTML = `
+                    <div class="saved-report-date">${formattedDate} ${isMonthly ? '(Monthly)' : ''}</div>
+                    <div class="saved-report-preview">${preview}</div>
+                    <div class="saved-report-actions">
+                        <button class="saved-report-btn view" onclick="viewSavedReport(${index})">View</button>
+                        <button class="saved-report-btn pdf" onclick="exportSavedReportPDF(${index})">PDF</button>
+                        <button class="saved-report-btn delete" onclick="deleteSavedReport(${index})">Delete</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        function saveDailyReport() {
+            if (!currentReportText || currentReportText.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error');
+                return;
+            }
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            savedReports.push({ date: appData.currentDate.toISOString(), report: currentReportText, type: 'daily' });
+            localStorage.setItem('savedReports', JSON.stringify(savedReports));
+            showToast('Report saved successfully!');
+            loadSavedReports();
+        }
+        
+        function viewSavedReport(index) {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            if (index >= 0 && index < savedReports.length) {
+                const report = savedReports[index];
+                const reportDate = new Date(report.date);
+                const formattedDate = formatDate(reportDate);
+                const title = report.type === 'monthly' ? `📋 Monthly Report - ${formattedDate}` : `📋 Report - ${formattedDate}`;
+                document.getElementById('viewReportTitle').textContent = title;
+                document.getElementById('viewReportContent').textContent = report.report;
+                openModal('viewReportModal');
+            }
+        }
+        
+        function deleteSavedReport(index) {
+            if (confirm('Are you sure you want to delete this report?')) {
+                const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+                savedReports.splice(index, 1);
+                localStorage.setItem('savedReports', JSON.stringify(savedReports));
+                loadSavedReports();
+                showToast('Report deleted');
+            }
+        }
+        
+        function deleteAllReports() {
+            if (confirm('Are you sure you want to delete ALL saved reports? This cannot be undone!')) {
+                localStorage.removeItem('savedReports');
+                loadSavedReports();
+                showToast('All reports deleted');
+            }
+        }
+        
+        function exportSavedReportPDF(index) {
+            const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+            if (index >= 0 && index < savedReports.length) {
+                const report = savedReports[index];
+                currentReportText = report.report;
+                if (report.type === 'monthly') {
+                    appData.currentReportType = 'monthly';
+                    const reportDate = new Date(report.date);
+                    document.getElementById('monthSelect').value = reportDate.getMonth() + 1;
+                    document.getElementById('yearSelect').value = reportDate.getFullYear();
+                    exportMonthlyToPDF();
+                } else {
+                    appData.currentReportType = 'daily';
+                    appData.currentDate = new Date(report.date);
+                    exportToPDF();
+                }
+            }
+        }
+        
+        // ==================== DATA MANAGEMENT (EXPORT/IMPORT) ====================
+        function showDataManagement() { openModal('dataManagementModal'); }
+        
+        function exportAllData() {
+            try {
+                const savedReports = JSON.parse(localStorage.getItem('savedReports') || '[]');
+                const savedDates = JSON.parse(localStorage.getItem('saved_dates') || '[]');
+                const dailyData = {};
+                savedDates.forEach(dateStr => {
+                    const data = localStorage.getItem(`report_data_${dateStr}`);
+                    if (data) dailyData[dateStr] = JSON.parse(data);
+                });
+                const pdfSettings = JSON.parse(localStorage.getItem('pdfSettings') || '{}');
+                const exportData = {
+                    version: '1.0', exportDate: new Date().toISOString(),
+                    savedReports: savedReports, dailyData: dailyData,
+                    pdfSettings: pdfSettings, totalReports: savedReports.length,
+                    totalDailyEntries: Object.keys(dailyData).length
+                };
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                const dateStr = formatDateForFile(new Date());
+                a.href = url; a.download = `construction_reports_backup_${dateStr}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                URL.revokeObjectURL(url); showToast('All data exported successfully!');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Error exporting data: ' + error.message, 'error');
+            }
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importData = JSON.parse(e.target.result);
+                        const statusDiv = document.getElementById('importStatus');
+                        if (!importData.savedReports || !importData.dailyData) {
+                            statusDiv.innerHTML = '<div style="color: #721c24; background: #f8d7da; padding: 10px; border-radius: 5px;">Invalid data file format</div>';
+                            statusDiv.style.display = 'block'; return;
+                        }
+                        if (!confirm(`This will import:\n• ${importData.totalReports || 0} saved reports\n• ${importData.totalDailyEntries || 0} daily entries\n\nAll existing data will be replaced. Continue?`)) return;
+                        localStorage.removeItem('savedReports');
+                        localStorage.setItem('savedReports', JSON.stringify(importData.savedReports));
+                        const existingDates = JSON.parse(localStorage.getItem('saved_dates') || '[]');
+                        existingDates.forEach(dateStr => localStorage.removeItem(`report_data_${dateStr}`));
+                        const savedDates = [];
+                        Object.keys(importData.dailyData).forEach(dateStr => {
+                            localStorage.setItem(`report_data_${dateStr}`, JSON.stringify(importData.dailyData[dateStr]));
+                            savedDates.push(dateStr);
+                        });
+                        localStorage.setItem('saved_dates', JSON.stringify(savedDates));
+                        if (importData.pdfSettings) {
+                            localStorage.setItem('pdfSettings', JSON.stringify(importData.pdfSettings));
+                            loadPdfSettings();
+                        }
+                        loadDataForCurrentDate(); loadSavedReports();
+                        statusDiv.innerHTML = '<div style="color: #155724; background: #d4edda; padding: 10px; border-radius: 5px;">✅ Data imported successfully!</div>';
+                        statusDiv.style.display = 'block'; showToast('Data imported successfully!');
+                        setTimeout(() => statusDiv.style.display = 'none', 5000);
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        const statusDiv = document.getElementById('importStatus');
+                        statusDiv.innerHTML = `<div style="color: #721c24; background: #f8d7da; padding: 10px; border-radius: 5px;">Error importing data: ${error.message}</div>`;
+                        statusDiv.style.display = 'block';
+                    }
+                }; reader.readAsText(file);
+            }; input.click();
+        }
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function formatDateForFile(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function showDatePicker() {
+            const datePicker = document.getElementById('datePicker');
+            datePicker.value = appData.currentDate.toISOString().split('T')[0];
+            openModal('dateModal');
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function showChangePassword() { openModal('passwordModal'); }
+        
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordError');
+            const storedPassword = localStorage.getItem(PASSWORD_KEY);
+            errorDiv.style.display = 'none';
+            if (!current || !newPass || !confirm) {
+                errorDiv.textContent = 'All fields are required'; errorDiv.style.display = 'block'; return;
+            }
+            if (current !== storedPassword) {
+                errorDiv.textContent = 'Current password is incorrect'; errorDiv.style.display = 'block'; return;
+            }
+            if (newPass.length < 6) {
+                errorDiv.textContent = 'New password must be at least 6 characters'; errorDiv.style.display = 'block'; return;
+            }
+            if (newPass !== confirm) {
+                errorDiv.textContent = 'New passwords do not match'; errorDiv.style.display = 'block'; return;
+            }
+            localStorage.setItem(PASSWORD_KEY, newPass);
+            showToast('Password changed successfully'); closeModal();
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            if (tabName === 'saved') loadSavedReports();
+        }
+        
+        function showSavedReports() { switchTab('saved'); }
+        
+        function saveReport() {
+            if (!currentReportText || currentReportText.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error'); return;
+            }
+            const blob = new Blob([currentReportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const dateStr = formatDateForFile(appData.currentDate);
+            a.href = url; a.download = `Daily_Report_${dateStr}.txt`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url); showToast('Report saved as text file');
+        }
+        
+        function showPdfSettings(type) { currentPdfType = type; openModal('pdfSettingsModal'); }
+        
+        function generatePDFBasedOnType() {
+            if (currentPdfType === 'daily') exportToPDF();
+            else if (currentPdfType === 'monthly') exportMonthlyToPDF();
+            closeModal();
+        }
+        
+        function showShareOptions() {
+            if (document.getElementById('dailyTab').classList.contains('active')) {
+                currentReportText = document.getElementById('reportOutput').textContent;
+            } else if (document.getElementById('monthlyTab').classList.contains('active')) {
+                currentReportText = document.getElementById('monthlyReportOutput').textContent;
+            }
+            if (!currentReportText || currentReportText.includes('Report will appear here')) {
+                showToast('Please generate a report first', 'error'); return;
+            }
+            openModal('shareModal');
+        }
+        
+        function shareToWhatsApp() {
+            if (!currentReportText) { showToast('No report to share', 'error'); return; }
+            const text = encodeURIComponent(currentReportText);
+            const whatsappUrl = `https://wa.me/?text=${text}`;
+            window.open(whatsappUrl, '_blank'); showToast('Opening WhatsApp...'); closeModal();
+        }
+        
+        function shareToEmail() {
+            if (!currentReportText) { showToast('No report to share', 'error'); return; }
+            const subject = encodeURIComponent('Construction Daily Report');
+            const body = encodeURIComponent(currentReportText);
+            const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+            window.location.href = mailtoUrl; showToast('Opening email client...'); closeModal();
+        }
+        
+        function copyToClipboard() {
+            if (!currentReportText) { showToast('No report to copy', 'error'); return; }
+            navigator.clipboard.writeText(currentReportText).then(() => {
+                showToast('Report copied to clipboard!'); closeModal();
+            }).catch(err => { showToast('Failed to copy: ' + err, 'error'); });
+        }
+        
+        function printReport() {
+            if (!currentReportText) { showToast('No report to print', 'error'); return; }
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`<!DOCTYPE html><html><head><title>Construction Report</title><style>body{font-family:Arial,sans-serif;margin:20px;}pre{white-space:pre-wrap;font-size:12px;line-height:1.4;}@media print{body{margin:0;padding:10px;}pre{font-size:11px;}}</style></head><body><h2>Construction Daily Report</h2><pre>${currentReportText}</pre><script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);}<\/script></body></html>`);
+            printWindow.document.close(); showToast('Opening print dialog...'); closeModal();
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('preparedByName').addEventListener('input', function() {
+                appData.pdfSettings.preparedByName = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            document.getElementById('preparedByDesignation').addEventListener('input', function() {
+                appData.pdfSettings.preparedByDesignation = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            document.getElementById('witnessedByName').addEventListener('input', function() {
+                appData.pdfSettings.witnessedByName = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            document.getElementById('witnessedByDesignation').addEventListener('input', function() {
+                appData.pdfSettings.witnessedByDesignation = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+            document.getElementById('companyStamp').addEventListener('input', function() {
+                appData.pdfSettings.companyStamp = this.value;
+                localStorage.setItem('pdfSettings', JSON.stringify(appData.pdfSettings));
+            });
+        }
+        
+        function loadPdfSettings() {
+            const saved = localStorage.getItem('pdfSettings');
+            if (saved) {
+                const savedSettings = JSON.parse(saved);
+                appData.pdfSettings = { ...appData.pdfSettings, ...savedSettings };
+                document.getElementById('preparedByName').value = appData.pdfSettings.preparedByName;
+                document.getElementById('preparedByDesignation').value = appData.pdfSettings.preparedByDesignation;
+                document.getElementById('witnessedByName').value = appData.pdfSettings.witnessedByName;
+                document.getElementById('witnessedByDesignation').value = appData.pdfSettings.witnessedByDesignation;
+                document.getElementById('companyStamp').value = appData.pdfSettings.companyStamp;
+            }
+        }
         
         // ==================== INITIALIZE APPLICATION ====================
         document.addEventListener('DOMContentLoaded', initApp);
